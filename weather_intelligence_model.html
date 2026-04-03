@@ -1,0 +1,2713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weather Intelligence Prescriptive Model — NMHS Value Creation</title>
+<style>
+  /* ======= RESET & BASE ======= */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f4f8; color: #1a2332; min-height: 100vh; }
+
+  /* ======= HEADER ======= */
+  header {
+    background: linear-gradient(135deg, #0a2342 0%, #1a4480 60%, #1565c0 100%);
+    color: white; padding: 20px 32px 16px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+  }
+  header h1 { font-size: 1.5rem; font-weight: 700; letter-spacing: 0.02em; }
+  header p { font-size: 0.85rem; opacity: 0.75; margin-top: 4px; }
+  header .subtitle { font-size: 0.8rem; opacity: 0.6; margin-top: 2px; font-style: italic; }
+
+  /* ======= NAV TABS ======= */
+  .nav-bar {
+    background: #0d2b52;
+    display: flex; align-items: center; gap: 2px;
+    padding: 0 24px; overflow-x: auto;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  }
+  .nav-tab {
+    background: transparent; border: none; color: rgba(255,255,255,0.65);
+    font-size: 0.82rem; font-weight: 600; letter-spacing: 0.04em;
+    padding: 13px 18px; cursor: pointer; border-bottom: 3px solid transparent;
+    transition: all 0.2s; white-space: nowrap; text-transform: uppercase;
+  }
+  .nav-tab:hover { color: white; background: rgba(255,255,255,0.07); }
+  .nav-tab.active { color: #4db8ff; border-bottom-color: #4db8ff; background: rgba(77,184,255,0.1); }
+  .nav-icon { margin-right: 6px; font-size: 1em; }
+
+  /* ======= MAIN LAYOUT ======= */
+  main { max-width: 1280px; margin: 0 auto; padding: 24px 20px 48px; }
+
+  /* ======= PAGE SECTIONS ======= */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* ======= SECTION CARDS ======= */
+  .card {
+    background: white; border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    padding: 24px 28px; margin-bottom: 20px;
+  }
+  .card-title {
+    font-size: 1.05rem; font-weight: 700; color: #0a2342;
+    border-left: 4px solid #1565c0; padding-left: 12px; margin-bottom: 16px;
+  }
+  .card-subtitle { font-size: 0.78rem; color: #6b7a8d; margin-top: 2px; font-weight: 400; }
+
+  /* ======= FLOW DIAGRAM ======= */
+  .flow-container { overflow-x: auto; padding-bottom: 8px; }
+  .flow-diagram {
+    display: flex; align-items: flex-start; gap: 0;
+    min-width: 820px; padding: 12px 4px;
+  }
+  .flow-col { display: flex; flex-direction: column; align-items: center; min-width: 130px; flex: 1; }
+  .flow-col-label {
+    font-size: 0.68rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.06em; color: #6b7a8d; margin-bottom: 8px; text-align: center;
+  }
+  .flow-node {
+    border-radius: 8px; padding: 8px 10px; font-size: 0.72rem;
+    text-align: center; font-weight: 600; min-height: 44px;
+    display: flex; align-items: center; justify-content: center;
+    line-height: 1.3; width: 100%; position: relative; cursor: default;
+    transition: transform 0.15s, box-shadow 0.15s;
+    margin-bottom: 6px;
+  }
+  .flow-node:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+  .node-blue { background: #e3f2fd; color: #0d47a1; border: 1.5px solid #90caf9; }
+  .node-teal { background: #e0f7fa; color: #006064; border: 1.5px solid #80deea; }
+  .node-green { background: #e8f5e9; color: #1b5e20; border: 1.5px solid #a5d6a7; }
+  .node-amber { background: #fff8e1; color: #e65100; border: 1.5px solid #ffcc80; }
+  .node-red { background: #fce4ec; color: #880e4f; border: 1.5px solid #f48fb1; }
+  .node-purple { background: #ede7f6; color: #4a148c; border: 1.5px solid #ce93d8; }
+  .node-grey { background: #f5f5f5; color: #37474f; border: 1.5px solid #cfd8dc; }
+  .node-nmhs { background: #1565c0; color: white; border: 1.5px solid #0d47a1; font-weight: 700; }
+
+  .flow-arrow {
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem; color: #90a4ae; min-width: 24px; padding-top: 30px;
+    flex-shrink: 0;
+  }
+  .flow-group { display: flex; flex-direction: column; gap: 6px; width: 100%; }
+  .flow-note {
+    font-size: 0.65rem; color: #78909c; text-align: center; margin-top: 2px;
+    font-style: italic;
+  }
+
+  /* ======= LEGEND ======= */
+  .legend {
+    display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px;
+  }
+  .legend-item {
+    display: flex; align-items: center; gap: 5px;
+    font-size: 0.7rem; color: #546e7a;
+  }
+  .legend-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+
+  /* ======= INPUTS GRID ======= */
+  .inputs-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 16px;
+  }
+  .input-group { display: flex; flex-direction: column; gap: 5px; }
+  .input-group label {
+    font-size: 0.75rem; font-weight: 600; color: #37474f;
+  }
+  .input-group .input-desc { font-size: 0.68rem; color: #90a4ae; }
+  .input-group input[type="number"], .input-group select {
+    padding: 8px 10px; border: 1.5px solid #cfd8dc; border-radius: 7px;
+    font-size: 0.85rem; color: #1a2332; background: #fafafa;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .input-group input[type="number"]:focus, .input-group select:focus {
+    outline: none; border-color: #1565c0; box-shadow: 0 0 0 3px rgba(21,101,192,0.12);
+  }
+  .input-group .unit {
+    font-size: 0.68rem; color: #78909c; margin-top: 1px;
+  }
+
+  /* ======= RESULTS ======= */
+  .results-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 14px; margin-top: 4px;
+  }
+  .result-card {
+    background: linear-gradient(135deg, #e8f4fd, #d0eaff);
+    border-radius: 10px; padding: 16px 18px;
+    border-left: 4px solid #1565c0;
+  }
+  .result-card.positive { background: linear-gradient(135deg, #e8f5e9, #c8e6c9); border-left-color: #2e7d32; }
+  .result-card.warning { background: linear-gradient(135deg, #fff8e1, #ffecb3); border-left-color: #f57f17; }
+  .result-card.total { background: linear-gradient(135deg, #1565c0, #0d47a1); border-left-color: #0a1f60; }
+  .result-label { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #546e7a; }
+  .result-card.total .result-label { color: rgba(255,255,255,0.75); }
+  .result-value { font-size: 1.3rem; font-weight: 800; color: #0d47a1; margin-top: 4px; }
+  .result-card.positive .result-value { color: #1b5e20; }
+  .result-card.warning .result-value { color: #bf360c; }
+  .result-card.total .result-value { color: white; font-size: 1.5rem; }
+  .result-sub { font-size: 0.68rem; color: #78909c; margin-top: 2px; }
+  .result-card.total .result-sub { color: rgba(255,255,255,0.6); }
+
+  /* ======= ASSUMPTIONS BOX ======= */
+  .assumptions {
+    background: #f8f9fa; border-radius: 8px; padding: 14px 16px;
+    border-left: 3px solid #90a4ae; margin-top: 12px;
+    font-size: 0.72rem; color: #546e7a; line-height: 1.7;
+  }
+  .assumptions strong { color: #37474f; }
+
+  /* ======= COMPARISON TABLE ======= */
+  .compare-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
+  }
+  @media (max-width: 720px) { .compare-grid { grid-template-columns: 1fr; } }
+  .compare-sector-card {
+    border-radius: 10px; padding: 18px 16px; border-top: 4px solid;
+    background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  }
+  .compare-sector-card.fisheries { border-top-color: #00acc1; }
+  .compare-sector-card.disaster  { border-top-color: #e53935; }
+  .compare-sector-card.transport { border-top-color: #f57c00; }
+  .compare-sector-card.aqua      { border-top-color: #43a047; }
+  .compare-sector-card.health    { border-top-color: #d81b60; }
+  .compare-sector-card.aviation  { border-top-color: #3949ab; }
+  .compare-sector-card.energy    { border-top-color: #f9a825; }
+  .compare-sector-name { font-size: 0.8rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 12px; }
+  .compare-sector-card.fisheries .compare-sector-name { color: #00838f; }
+  .compare-sector-card.disaster  .compare-sector-name { color: #c62828; }
+  .compare-sector-card.transport .compare-sector-name { color: #e65100; }
+  .compare-sector-card.aqua      .compare-sector-name { color: #2e7d32; }
+  .compare-sector-card.health    .compare-sector-name { color: #ad1457; }
+  .compare-sector-card.aviation  .compare-sector-name { color: #1a237e; }
+  .compare-sector-card.energy    .compare-sector-name { color: #e65100; }
+  .compare-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; border-bottom: 1px solid #f0f0f0; font-size: 0.74rem; }
+  .compare-row:last-child { border-bottom: none; }
+  .compare-row .clabel { color: #78909c; }
+  .compare-row .cvalue { font-weight: 700; color: #1a2332; }
+  .compare-total { margin-top: 10px; padding-top: 10px; border-top: 2px solid; font-size: 1.05rem; font-weight: 800; }
+  .compare-sector-card.fisheries .compare-total { color: #006064; border-top-color: #00acc1; }
+  .compare-sector-card.disaster  .compare-total { color: #b71c1c; border-top-color: #e53935; }
+  .compare-sector-card.transport .compare-total { color: #bf360c; border-top-color: #f57c00; }
+  .compare-sector-card.aqua      .compare-total { color: #1b5e20; border-top-color: #43a047; }
+  .compare-sector-card.health    .compare-total { color: #880e4f; border-top-color: #d81b60; }
+  .compare-sector-card.aviation  .compare-total { color: #1a237e; border-top-color: #3949ab; }
+  .compare-sector-card.energy    .compare-total { color: #e65100; border-top-color: #f9a825; }
+  .compare-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .compare-grid-5 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  @media (max-width: 900px) { .compare-grid-5 { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 560px) { .compare-grid-5 { grid-template-columns: 1fr; } }
+  .bar-container { margin-top: 8px; }
+  .bar-track { background: #eceff1; border-radius: 4px; height: 8px; overflow: hidden; margin-top: 3px; }
+  .bar-fill { height: 100%; border-radius: 4px; transition: width 0.7s cubic-bezier(0.4,0,0.2,1); }
+  .bar-fisheries { background: #00acc1; }
+  .bar-disaster  { background: #e53935; }
+  .bar-transport { background: #f57c00; }
+  .bar-aqua      { background: #43a047; }
+  .bar-health    { background: #d81b60; }
+  .bar-aviation  { background: #3949ab; }
+  .bar-energy    { background: #f9a825; }
+  .bar-banking   { background: #7b1fa2; }
+  .bar-construction { background: #546e7a; }
+
+  .compare-sector-card.banking { border-top-color: #7b1fa2; }
+  .compare-sector-card.construction { border-top-color: #37474f; }
+  .compare-sector-card.banking .compare-sector-name { color: #6a1b9a; }
+  .compare-sector-card.construction .compare-sector-name { color: #37474f; }
+  .compare-sector-card.banking .compare-total { color: #4a148c; border-top-color: #7b1fa2; }
+  .compare-sector-card.construction .compare-total { color: #263238; border-top-color: #37474f; }
+  .badge-tourism { background: #e0f2f1; color: #00574B; }
+  .bar-tourism { background: #00897B; }
+  .compare-sector-card.tourism { border-top-color: #00897B; }
+  .compare-sector-card.tourism .compare-sector-name { color: #00574B; }
+  .compare-sector-card.tourism .compare-total { color: #004D40; border-top-color: #00897B; }
+  .badge-wrm { background: #e3f2fd; color: #01579B; }
+  .bar-wrm { background: #0288D1; }
+  .compare-sector-card.wrm { border-top-color: #0288D1; }
+  .compare-sector-card.wrm .compare-sector-name { color: #01579B; }
+  .compare-sector-card.wrm .compare-total { color: #01579B; border-top-color: #0288D1; }
+  .badge-banking { background: #f3e5f5; color: #4a148c; }
+  .badge-construction { background: #eceff1; color: #37474f; }
+
+  /* ======= ABOUT PAGE ======= */
+  .about-section { font-size: 0.85rem; line-height: 1.8; color: #37474f; }
+  .about-section h3 { color: #0a2342; font-size: 0.95rem; margin: 16px 0 6px; }
+  .about-section p { margin-bottom: 10px; }
+  .ref-item { font-size: 0.73rem; color: #78909c; margin-bottom: 6px; line-height: 1.5; }
+  .tag-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .tag { background: #e3f2fd; color: #0d47a1; border-radius: 20px; padding: 3px 10px; font-size: 0.7rem; font-weight: 600; }
+
+  /* ======= BUTTONS ======= */
+  .btn {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 9px 18px; border-radius: 8px; border: none; cursor: pointer;
+    font-size: 0.8rem; font-weight: 700; letter-spacing: 0.03em;
+    transition: all 0.2s;
+  }
+  .btn-primary { background: #1565c0; color: white; }
+  .btn-primary:hover { background: #0d47a1; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(21,101,192,0.3); }
+  .btn-outline { background: transparent; color: #1565c0; border: 2px solid #1565c0; }
+  .btn-outline:hover { background: #e3f2fd; }
+  .btn-export { background: #2e7d32; color: white; }
+  .btn-export:hover { background: #1b5e20; }
+  .btn-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+
+  /* ======= SECTOR BADGE ======= */
+  .sector-badge {
+    display: inline-block; border-radius: 20px; padding: 3px 12px;
+    font-size: 0.72rem; font-weight: 700; letter-spacing: 0.04em; margin-bottom: 8px;
+  }
+  .badge-fisheries { background: #e0f7fa; color: #006064; }
+  .badge-disaster  { background: #ffebee; color: #b71c1c; }
+  .badge-transport { background: #fff3e0; color: #bf360c; }
+  .badge-aqua      { background: #e8f5e9; color: #1b5e20; }
+  .badge-health    { background: #fce4ec; color: #880e4f; }
+  .badge-aviation  { background: #e8eaf6; color: #1a237e; }
+  .badge-energy    { background: #fff9c4; color: #f57f17; }
+
+  /* ======= UTILITY ======= */
+  .flex-between { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+  .text-muted { font-size: 0.75rem; color: #90a4ae; }
+  .mt-4 { margin-top: 16px; }
+  .mb-2 { margin-bottom: 8px; }
+  .divider { border: none; border-top: 1px solid #eceff1; margin: 16px 0; }
+  .info-banner {
+    background: #e8f4fd; border-left: 4px solid #1565c0; border-radius: 0 8px 8px 0;
+    padding: 10px 14px; font-size: 0.75rem; color: #0d47a1; margin-bottom: 16px; line-height: 1.6;
+  }
+  .info-banner strong { font-weight: 700; }
+
+  /* ======= TOOLTIP (JS-managed, appended to body to escape overflow clipping) ======= */
+  [data-tip] { cursor: default; }
+  .js-tooltip {
+    display: none;
+    position: fixed;
+    background: #1a2332; color: white;
+    border-radius: 6px; padding: 6px 11px;
+    font-size: 0.68rem; white-space: nowrap;
+    z-index: 9999; pointer-events: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.28);
+    font-family: 'Segoe UI', Arial, sans-serif;
+  }
+  .js-tooltip.visible { display: block; }
+
+  /* ======= PRINT ======= */
+  @media print {
+    .nav-bar, .btn-row, header p { display: none; }
+    .page { display: block !important; }
+    .card { box-shadow: none; border: 1px solid #ddd; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🌦️ Weather Intelligence Prescriptive Model</h1>
+  <p>National Meteorological &amp; Hydrological Services — Sector Value Creation Framework</p>
+  <p class="subtitle">Based on: Rogers, D. (2026). Maximizing Value Creation. The Business of Weather.</p>
+</header>
+
+<nav class="nav-bar">
+  <button class="nav-tab active" onclick="showPage('fisheries')"><span class="nav-icon">🐟</span>Fisheries &amp; Aquaculture</button>
+  <button class="nav-tab" onclick="showPage('disaster')"><span class="nav-icon">🌪️</span>Disaster Mgmt</button>
+  <button class="nav-tab" onclick="showPage('transport')"><span class="nav-icon">🚛</span>Road Transport</button>
+  <button class="nav-tab" onclick="showPage('aqua')"><span class="nav-icon">🌾</span>Farming</button>
+  <button class="nav-tab" onclick="showPage('health')"><span class="nav-icon">🏥</span>Human Health</button>
+  <button class="nav-tab" onclick="showPage('aviation')"><span class="nav-icon">✈️</span>Aviation</button>
+  <button class="nav-tab" onclick="showPage('energy')"><span class="nav-icon">⚡</span>Energy</button>
+  <button class="nav-tab" onclick="showPage('banking')"><span class="nav-icon">🏦</span>Banking</button>
+  <button class="nav-tab" onclick="showPage('construction')"><span class="nav-icon">🏗️</span>Construction</button>
+  <button class="nav-tab" onclick="showPage('tourism')"><span class="nav-icon">🏖️</span>Tourism</button>
+  <button class="nav-tab" onclick="showPage('wrm')"><span class="nav-icon">&#128167;</span>Water Resources</button>
+  <button class="nav-tab" onclick="showPage('compare')"><span class="nav-icon">📊</span>Compare Sectors</button>
+  <button class="nav-tab" onclick="showPage('about')"><span class="nav-icon">ℹ️</span>About</button>
+</nav>
+
+<main>
+
+<!-- ============================================================ -->
+<!-- PAGE: FISHERIES                                              -->
+<!-- ============================================================ -->
+<section id="page-fisheries" class="page active">
+  <div class="card">
+    <div class="flex-between">
+      <div>
+        <span class="sector-badge badge-fisheries">🐟 Fisheries &amp; Aquaculture</span>
+        <div class="card-title">Prescriptive Model — Fisheries &amp; Aquaculture Value Chain</div>
+      </div>
+    </div>
+    <div class="info-banner">
+      <strong>How to read this diagram:</strong> Weather intelligence flows from NMHS services through decision-makers to produce economic and social value outcomes. This model covers both wild-capture <strong>fisheries</strong> and <strong>aquaculture</strong> (marine cage, coastal shellfish, inland ponds) — which share marine weather, HAB, and SST dependencies. Hover over nodes for details.
+    </div>
+    <div class="flow-container">
+      <div class="flow-diagram">
+        <!-- Col 1: Data/Services -->
+        <div class="flow-col">
+          <div class="flow-col-label">NMHS Services</div>
+          <div class="flow-group">
+            <div class="flow-node node-nmhs" data-tip="National Met/Hydro Service — primary data provider">NMHS<br/>Weather &amp; Marine<br/>Forecasts</div>
+            <div class="flow-node node-blue" data-tip="Fisheries departments providing stock location data">Fisheries<br/>Services</div>
+            <div class="flow-node node-blue" data-tip="ICT infrastructure for warning dissemination">Mobile<br/>Operators / ICT</div>
+          </div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <!-- Col 2: Intermediaries -->
+        <div class="flow-col">
+          <div class="flow-col-label">Intermediaries</div>
+          <div class="flow-group">
+            <div class="flow-node node-teal" data-tip="Disaster management agencies relay warnings to fishers">Disaster Mgmt<br/>Agencies</div>
+            <div class="flow-node node-teal" data-tip="Port and harbour management authorities">Port<br/>Authorities</div>
+            <div class="flow-node node-teal" data-tip="Coast guard, navy for safety enforcement">Coast Guard<br/>/ Navy</div>
+          </div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <!-- Col 3: Decision Makers -->
+        <div class="flow-col">
+          <div class="flow-col-label">Decision Makers</div>
+          <div class="flow-group">
+            <div class="flow-node node-amber" data-tip="Act on warnings before heading to sea">Day &amp;<br/>Deep-Sea Fishers</div>
+            <div class="flow-node node-amber" data-tip="Marine cage, coastal and inland aquaculture operators — harvest timing, emergency aeration, HAB response">Aquaculture<br/>Operators</div>
+            <div class="flow-node node-amber" data-tip="Port operators manage loading, scheduling">Port<br/>Operators</div>
+            <div class="flow-node node-amber" data-tip="Hauliers adapt routes, timing for perishables">Hauliers &amp;<br/>Transport</div>
+            <div class="flow-node node-amber" data-tip="Markets manage supply chain disruptions">Wholesale,<br/>Retail &amp; Exporters</div>
+          </div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <!-- Col 4: Actions -->
+        <div class="flow-col">
+          <div class="flow-col-label">Weather-Intelligent Actions</div>
+          <div class="flow-group">
+            <div class="flow-node node-purple" data-tip="Fishers stay ashore during high-risk conditions">Comply with<br/>warnings; shelter</div>
+            <div class="flow-node node-purple" data-tip="Fish when conditions are optimal using forecasts">Target favourable<br/>fishing windows</div>
+            <div class="flow-node node-purple" data-tip="Adjust routes and schedules to protect perishables">Optimise<br/>routes &amp; timing</div>
+            <div class="flow-node node-purple" data-tip="Prepare supply chains for disruption">Pre-position<br/>supply chain</div>
+            <div class="flow-node node-purple" data-tip="Pre-harvest stock before storms; apply emergency aeration during heat events; respond to HAB alerts">Aquaculture: pre-harvest<br/>&amp; HAB response</div>
+          </div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <!-- Col 5: Outcomes -->
+        <div class="flow-col">
+          <div class="flow-col-label">Value Outcomes</div>
+          <div class="flow-group">
+            <div class="flow-node node-green" data-tip="Fewer maritime search and rescue deployments" data-tip="Fewer search-and-rescue call-outs and avoided total vessel losses as skippers use forecast weather windows and return to port before dangerous conditions">↓ SAR costs &amp;<br/>vessel losses</div>
+            <div class="flow-node node-green" data-tip="Higher catch rates on optimal days" data-tip="More time on productive grounds, better catch targeting, and fewer weather-lost days keep fleet yield per vessel-day high">↑ Fishing<br/>productivity</div>
+            <div class="flow-node node-green" data-tip="Fewer perishables lost due to delays" data-tip="Better ice and cold-chain planning coordinated with landing forecasts reduces spoilage and quality downgrades between catch and market">↓ Perishable<br/>losses</div>
+            <div class="flow-node node-green" data-tip="Reduced government emergency response" data-tip="Lower government expenditure on SAR operations, vessel replacement subsidies, and post-storm relief for the fishing community">↓ Govt<br/>spending</div>
+            <div class="flow-node node-green" data-tip="Fewer stock losses from storms and HAB events for aquaculture operators" data-tip="Advance storm and temperature alerts allow farmers to harvest early, deploy protective nets, or move cages, avoiding mass mortality events">↓ Aquaculture<br/>stock losses</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#1565c0;"></div>NMHS / Government Services</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#80deea;border:1px solid #80deea"></div>Intermediary Agencies</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#ffcc80;border:1px solid #ffcc80"></div>Decision Makers</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#ce93d8;border:1px solid #ce93d8"></div>Actions Taken</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#a5d6a7;border:1px solid #a5d6a7"></div>Value Outcomes</div>
+    </div>
+  </div>
+
+  <!-- INPUTS -->
+  <div class="card">
+    <div class="card-title">Parameter Inputs — Fisheries <span class="card-subtitle">Enter values for your national or regional context</span></div>
+    <div class="inputs-grid">
+      <div class="input-group">
+        <label>Active fishing vessels</label>
+        <input type="number" id="f_vessels" value="5000" min="1" oninput="calcFisheries()">
+        <span class="unit">number of vessels</span>
+      </div>
+      <div class="input-group">
+        <label>Average vessel value</label>
+        <input type="number" id="f_vessel_value" value="50000" min="1" oninput="calcFisheries()">
+        <span class="unit">USD per vessel</span>
+      </div>
+      <div class="input-group">
+        <label>Annual at-sea incidents (weather-related)</label>
+        <input type="number" id="f_incidents" value="40" min="0" oninput="calcFisheries()">
+        <span class="unit">incidents per year (baseline, no forecasts)</span>
+      </div>
+      <div class="input-group">
+        <label>Cost per SAR incident</label>
+        <input type="number" id="f_sar_cost" value="80000" min="1" oninput="calcFisheries()">
+        <span class="unit">USD per search &amp; rescue deployment</span>
+      </div>
+      <div class="input-group">
+        <label>Forecast warning compliance rate</label>
+        <input type="number" id="f_compliance" value="70" min="1" max="100" oninput="calcFisheries()">
+        <span class="unit">% of fishers who comply with warnings</span>
+      </div>
+      <div class="input-group">
+        <label>Annual fishing days per vessel</label>
+        <input type="number" id="f_fishing_days" value="180" min="1" oninput="calcFisheries()">
+        <span class="unit">days/year</span>
+      </div>
+      <div class="input-group">
+        <label>Average daily catch value</label>
+        <input type="number" id="f_catch_value" value="800" min="1" oninput="calcFisheries()">
+        <span class="unit">USD per vessel per day</span>
+      </div>
+      <div class="input-group">
+        <label>Productivity gain from forecasts</label>
+        <input type="number" id="f_productivity" value="8" min="0" max="100" oninput="calcFisheries()">
+        <span class="unit">% improvement in catch through targeting</span>
+      </div>
+      <div class="input-group">
+        <label>Annual value of perishable losses</label>
+        <input type="number" id="f_perishable" value="2000000" min="0" oninput="calcFisheries()">
+        <span class="unit">USD — total sector per year (baseline)</span>
+      </div>
+      <div class="input-group">
+        <label>Perishable loss reduction from forecasts</label>
+        <input type="number" id="f_perish_reduce" value="30" min="0" max="100" oninput="calcFisheries()">
+        <span class="unit">% reduction attributable to weather intelligence</span>
+      </div>
+    </div>
+
+    <hr class="divider">
+    <div class="card-title">Calculated Value — Fisheries</div>
+    <div class="results-grid" id="fisheries-results">
+      <!-- filled by JS -->
+    </div>
+    <div class="assumptions" id="fisheries-assumptions"></div>
+    <div class="btn-row">
+      <button class="btn btn-export" onclick="exportSummary('fisheries')">⬇ Export Summary</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- PAGE: DISASTER MANAGEMENT                                    -->
+<!-- ============================================================ -->
+<section id="page-disaster" class="page">
+  <div class="card">
+    <div class="flex-between">
+      <div>
+        <span class="sector-badge badge-disaster">🌪️ Disaster Management</span>
+        <div class="card-title">Prescriptive Model — Disaster Management Value Chain</div>
+      </div>
+    </div>
+    <div class="info-banner">
+      The primary goal is to minimize impacts on human life, livelihoods, property and the environment through timely, actionable weather and hydrological intelligence.
+    </div>
+    <div class="flow-container">
+      <div class="flow-diagram">
+        <div class="flow-col">
+          <div class="flow-col-label">Hazard Services</div>
+          <div class="flow-group">
+            <div class="flow-node node-nmhs" data-tip="NMHS — meteorological, hydrological, geophysical hazard info">NMHS: Met,<br/>Hydro &amp; Geo<br/>Services</div>
+            <div class="flow-node node-blue" data-tip="Geophysical agencies: seismic, volcanic monitoring">Geophysical<br/>Monitoring</div>
+            <div class="flow-node node-blue" data-tip="Hydrological river and flood monitoring networks">Hydrological<br/>Networks</div>
+          </div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-col">
+          <div class="flow-col-label">Warning & Comms</div>
+          <div class="flow-group">
+            <div class="flow-node node-red" data-tip="National emergency agencies issue public warnings">Disaster Mgmt<br/>Agencies</div>
+            <div class="flow-node node-teal" data-tip="Media, mobile operators broadcast alerts">Media &amp;<br/>Broadcast</div>
+            <div class="flow-node node-teal" data-tip="Local civil protection and first responders">Civil Protection<br/>&amp; First Responders</div>
+          </div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-col">
+          <div class="flow-col-label">Exposed Groups</div>
+          <div class="flow-group">
+            <div class="flow-node node-amber" data-tip="General population in hazard zones">At-risk<br/>Population</div>
+            <div class="flow-node node-amber" data-tip="Infrastructure and property owners">Infrastructure<br/>Managers</div>
+            <div class="flow-node node-amber" data-tip="Businesses in weather-sensitive locations">SMEs &amp;<br/>Large Businesses</div>
+            <div class="flow-node node-amber" data-tip="Financial institutions with climate exposure">Banks &amp;<br/>Insurers</div>
+          </div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-col">
+          <div class="flow-col-label">Protective Actions</div>
+          <div class="flow-group">
+            <div class="flow-node node-purple" data-tip="Residents shelter or evacuate based on warnings">Shelter-in-place<br/>/ Evacuate</div>
+            <div class="flow-node node-purple" data-tip="Businesses pause vulnerable operations proactively">Pause vulnerable<br/>operations</div>
+            <div class="flow-node node-purple" data-tip="Dam operators use forecasts to manage spillage">Pre-release<br/>reservoir water</div>
+            <div class="flow-node node-purple" data-tip="Emergency services pre-position resources">Pre-position<br/>resources</div>
+          </div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-col">
+          <div class="flow-col-label">Value Outcomes</div>
+          <div class="flow-group">
+            <div class="flow-node node-green" data-tip="Timely warnings give communities hours to days of lead time to evacuate, shelter, or take protective action before hazardous events arrive">↓ Loss of life<br/>&amp; injury</div>
+            <div class="flow-node node-green" data-tip="Early warnings allow stormproofing, drainage, asset relocation, and protective shutdowns, reducing damage to structures and networks">↓ Property &amp;<br/>infrastructure damage</div>
+            <div class="flow-node node-green" data-tip="Pre-positioned resources and coordinated pre-event response are substantially cheaper than reactive emergency deployment after impact">↓ Emergency<br/>management costs</div>
+            <div class="flow-node node-green" data-tip="Shorter disruption periods and faster recovery preserve economic output, employment, and business continuity in affected communities">↓ Productivity<br/>losses</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#1565c0;"></div>NMHS / Data Services</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#f48fb1;border:1px solid #f48fb1"></div>Warning &amp; Emergency Agencies</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#ffcc80;border:1px solid #ffcc80"></div>Exposed Actors</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#ce93d8;border:1px solid #ce93d8"></div>Protective Actions</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#a5d6a7;border:1px solid #a5d6a7"></div>Value Outcomes</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Parameter Inputs — Disaster Management <span class="card-subtitle">Based on annual national-level estimates</span></div>
+    <div class="inputs-grid">
+      <div class="input-group">
+        <label>Population in high-risk zones</label>
+        <input type="number" id="d_population" value="500000" min="1" oninput="calcDisaster()">
+        <span class="unit">persons</span>
+      </div>
+      <div class="input-group">
+        <label>Annual weather-related incidents (baseline)</label>
+        <input type="number" id="d_incidents" value="8" min="1" oninput="calcDisaster()">
+        <span class="unit">significant events per year</span>
+      </div>
+      <div class="input-group">
+        <label>Average property damage per event</label>
+        <input type="number" id="d_damage" value="5000000" min="1" oninput="calcDisaster()">
+        <span class="unit">USD</span>
+      </div>
+      <div class="input-group">
+        <label>Damage reduction from early warning</label>
+        <input type="number" id="d_damage_reduce" value="35" min="0" max="100" oninput="calcDisaster()">
+        <span class="unit">% reduction attributable to timely warnings</span>
+      </div>
+      <div class="input-group">
+        <label>Average emergency response cost per event</label>
+        <input type="number" id="d_response_cost" value="1200000" min="1" oninput="calcDisaster()">
+        <span class="unit">USD (govt emergency management)</span>
+      </div>
+      <div class="input-group">
+        <label>Emergency cost reduction from preparedness</label>
+        <input type="number" id="d_response_reduce" value="25" min="0" max="100" oninput="calcDisaster()">
+        <span class="unit">% reduction from pre-positioned resources</span>
+      </div>
+      <div class="input-group">
+        <label>Average productivity loss per event</label>
+        <input type="number" id="d_productivity" value="800000" min="0" oninput="calcDisaster()">
+        <span class="unit">USD (business disruption)</span>
+      </div>
+      <div class="input-group">
+        <label>Productivity loss reduction</label>
+        <input type="number" id="d_prod_reduce" value="40" min="0" max="100" oninput="calcDisaster()">
+        <span class="unit">% reduction from advance warnings</span>
+      </div>
+    </div>
+
+    <hr class="divider">
+    <div class="card-title">Calculated Value — Disaster Management</div>
+    <div class="results-grid" id="disaster-results"></div>
+    <div class="assumptions" id="disaster-assumptions"></div>
+    <div class="btn-row">
+      <button class="btn btn-export" onclick="exportSummary('disaster')">⬇ Export Summary</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- PAGE: ROAD TRANSPORT                                         -->
+<!-- ============================================================ -->
+<section id="page-transport" class="page">
+  <div class="card">
+    <div class="flex-between">
+      <div>
+        <span class="sector-badge badge-transport">🚛 Road Transport</span>
+        <div class="card-title">Prescriptive Model — Road Transport Value Chain</div>
+      </div>
+    </div>
+    <div class="info-banner">
+      Based on Frei et al. (2014) — the Swiss road transport methodology. Weather intelligence creates value across four dimensions: company profitability, government spending, infrastructure protection, and travel time.
+    </div>
+    <div class="flow-container">
+      <div class="flow-diagram">
+        <div class="flow-col">
+          <div class="flow-col-label">NMHS Outputs</div>
+          <div class="flow-group">
+            <div class="flow-node node-nmhs" data-tip="Road weather: ice, fog, flood, snow, wind forecasts">NMHS Road<br/>Weather &amp;<br/>Alarms</div>
+            <div class="flow-node node-blue" data-tip="Traffic and road network operations data">Traffic Mgmt<br/>Centres</div>
+          </div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-col">
+          <div class="flow-col-label">Service Providers</div>
+          <div class="flow-group">
+            <div class="flow-node node-teal" data-tip="National/regional road maintenance teams respond to ice, flooding">Road Maintenance<br/>Services</div>
+            <div class="flow-node node-teal" data-tip="Authorities manage closures, rerouting, speed limits">Traffic Control<br/>Authorities</div>
+          </div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-col">
+          <div class="flow-col-label">Road Users</div>
+          <div class="flow-group">
+            <div class="flow-node node-amber" data-tip="Freight operators adjust delivery schedules and routes">Freight &amp;<br/>Logistics Companies</div>
+            <div class="flow-node node-amber" data-tip="Urban and rural bus operators plan around conditions">Public Transport<br/>Operators</div>
+            <div class="flow-node node-amber" data-tip="Private vehicle drivers adjust travel plans">Individual<br/>Drivers</div>
+          </div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-col">
+          <div class="flow-col-label">Weather-Intelligent Actions</div>
+          <div class="flow-group">
+            <div class="flow-node node-purple" data-tip="Pre-treat roads before ice/snow events">Proactive de-icing<br/>&amp; road treatment</div>
+            <div class="flow-node node-purple" data-tip="Change schedules, reroute around hazards">Reschedule &amp;<br/>reroute deliveries</div>
+            <div class="flow-node node-purple" data-tip="Manage traffic flow around hazardous conditions">Implement traffic<br/>advisories</div>
+            <div class="flow-node node-purple" data-tip="Adjust personal travel timing, speed">Adapt personal<br/>travel behaviour</div>
+          </div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-col">
+          <div class="flow-col-label">Value Outcomes</div>
+          <div class="flow-group">
+            <div class="flow-node node-green" data-tip="Freight and logistics companies reduce fuel costs, avoid insurance claims, and improve vehicle utilisation through weather-optimised routing">↑ Company<br/>profitability</div>
+            <div class="flow-node node-green" data-tip="Proactive road treatment and surface protection reduces reactive maintenance, pothole repair, and infrastructure replacement costs">↓ Govt road<br/>spending</div>
+            <div class="flow-node node-green" data-tip="Weather-intelligent maintenance scheduling and load restrictions during extreme weather protect pavement life and bridge assets">↓ Infrastructure<br/>damage</div>
+            <div class="flow-node node-green" data-tip="Fewer weather-induced congestion events, incidents, and road closures shorten journey times for commuters and freight operators">↓ Travel time<br/>losses</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Parameter Inputs — Road Transport <span class="card-subtitle">Annual national/regional estimates (methodology: Frei et al. 2014)</span></div>
+    <div class="inputs-grid">
+      <div class="input-group">
+        <label>Annual vehicle-km (freight)</label>
+        <input type="number" id="t_freight_km" value="800000000" min="1" oninput="calcTransport()">
+        <span class="unit">km/year — national freight traffic</span>
+      </div>
+      <div class="input-group">
+        <label>Weather-sensitive freight fraction</label>
+        <input type="number" id="t_weather_frac" value="15" min="0" max="100" oninput="calcTransport()">
+        <span class="unit">% of journeys significantly affected by weather</span>
+      </div>
+      <div class="input-group">
+        <label>Cost of weather delay per vehicle-km</label>
+        <input type="number" id="t_delay_cost" value="0.12" min="0" step="0.01" oninput="calcTransport()">
+        <span class="unit">USD per km (delay + fuel + productivity)</span>
+      </div>
+      <div class="input-group">
+        <label>Delay reduction from weather intelligence</label>
+        <input type="number" id="t_delay_reduce" value="30" min="0" max="100" oninput="calcTransport()">
+        <span class="unit">% reduction attributable to road weather forecasts</span>
+      </div>
+      <div class="input-group">
+        <label>Annual road maintenance budget (weather-related)</label>
+        <input type="number" id="t_maint_budget" value="20000000" min="0" oninput="calcTransport()">
+        <span class="unit">USD — reactive spending on weather damage</span>
+      </div>
+      <div class="input-group">
+        <label>Maintenance cost reduction from proactive action</label>
+        <input type="number" id="t_maint_reduce" value="20" min="0" max="100" oninput="calcTransport()">
+        <span class="unit">% savings from proactive vs reactive maintenance</span>
+      </div>
+      <div class="input-group">
+        <label>Annual weather-related accidents</label>
+        <input type="number" id="t_accidents" value="2500" min="0" oninput="calcTransport()">
+        <span class="unit">accidents/year (baseline, no forecasts)</span>
+      </div>
+      <div class="input-group">
+        <label>Average cost per accident</label>
+        <input type="number" id="t_accident_cost" value="25000" min="0" oninput="calcTransport()">
+        <span class="unit">USD (damage + injury costs)</span>
+      </div>
+      <div class="input-group">
+        <label>Accident reduction from weather warnings</label>
+        <input type="number" id="t_acc_reduce" value="20" min="0" max="100" oninput="calcTransport()">
+        <span class="unit">% reduction from timely weather alerts</span>
+      </div>
+      <div class="input-group">
+        <label>Annual individual travel time lost (weather)</label>
+        <input type="number" id="t_travel_time" value="5000000" min="0" oninput="calcTransport()">
+        <span class="unit">person-hours lost due to weather delays</span>
+      </div>
+      <div class="input-group">
+        <label>Value of time</label>
+        <input type="number" id="t_vot" value="18" min="0" step="0.5" oninput="calcTransport()">
+        <span class="unit">USD per person-hour</span>
+      </div>
+      <div class="input-group">
+        <label>Travel time saving from better planning</label>
+        <input type="number" id="t_time_reduce" value="25" min="0" max="100" oninput="calcTransport()">
+        <span class="unit">% reduction from weather-intelligent decisions</span>
+      </div>
+    </div>
+
+    <hr class="divider">
+    <div class="card-title">Calculated Value — Road Transport</div>
+    <div class="results-grid" id="transport-results"></div>
+    <div class="assumptions" id="transport-assumptions"></div>
+    <div class="btn-row">
+      <button class="btn btn-export" onclick="exportSummary('transport')">⬇ Export Summary</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- PAGE: FARMING                                                    -->
+<!-- ============================================================ -->
+<section id="page-aqua" class="page">
+  <div class="card">
+    <div class="flex-between">
+      <div>
+        <span class="sector-badge badge-aqua">🌾 Farming</span>
+        <div class="card-title">Prescriptive Model — Farming Value Chain</div>
+      </div>
+    </div>
+    <div class="info-banner">
+      Three interrelated service pillars drive value: <strong>extension services</strong> (optimise farming practice), <strong>haulage &amp; transport</strong> (protect perishable produce), and <strong>financial institutions</strong> (de-risk agricultural portfolios). Unlike fisheries and aquaculture, <strong>seasonal climate intelligence</strong> is the dominant intelligence type — planting windows, drought and flood outlooks, and pest and disease risk forecasts.
+    </div>
+    <div class="flow-container">
+      <div class="flow-diagram">
+        <div class="flow-col">
+          <div class="flow-col-label">NMHS Services</div>
+          <div class="flow-group">
+            <div class="flow-node node-nmhs" data-tip="Short-range forecasts, seasonal outlooks, climate projections">NMHS: Seasonal<br/>Climate &amp; Weather<br/>Intelligence</div>
+            <div class="flow-node node-blue" data-tip="Hydrological services for irrigation and flood risk">Hydrological<br/>Services</div>
+            <div class="flow-node node-blue" data-tip="Environmental monitoring for disease, pollen, UV">Environmental<br/>Monitoring</div>
+          </div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-col">
+          <div class="flow-col-label">Service Pillars</div>
+          <div class="flow-group">
+            <div class="flow-node node-teal" data-tip="Government farming depts provide intelligence to smallholders via field agents">Agricultural<br/>Extension Services</div>
+            <div class="flow-node node-teal" data-tip="Road/rail network management for produce transport">Transport Network<br/>Managers</div>
+            <div class="flow-node node-teal" data-tip="Banks, microfinance, insurers adjust portfolios for climate risk">Commercial Banks<br/>&amp; Insurers</div>
+          </div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-col">
+          <div class="flow-col-label">Decision Makers</div>
+          <div class="flow-group">
+            <div class="flow-node node-amber" data-tip="Smallholder farmers and producers making planting and harvest decisions">Smallholder Farmers<br/>&amp; Producers</div>
+            <div class="flow-node node-amber" data-tip="Large agribusiness managing complex supply chains">Large Agribusiness<br/>&amp; Supply Chains</div>
+            <div class="flow-node node-amber" data-tip="Hauliers transporting perishable produce">Hauliers &amp;<br/>Logistics</div>
+            <div class="flow-node node-amber" data-tip="Wholesale, retail and export market operators">Wholesale, Retail<br/>&amp; Exporters</div>
+          </div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-col">
+          <div class="flow-col-label">Weather-Intelligent Actions</div>
+          <div class="flow-group">
+            <div class="flow-node node-purple" data-tip="Use seasonal outlooks to choose crop varieties and planting windows">Optimise planting<br/>schedules &amp; varieties</div>
+            <div class="flow-node node-purple" data-tip="Apply irrigation and crop protection based on forecasts">Manage water<br/>resources &amp; disease risk</div>
+            <div class="flow-node node-purple" data-tip="Re-route haulage to avoid flooded or damaged roads">Re-route haulage;<br/>protect perishables</div>
+            <div class="flow-node node-purple" data-tip="Adjust credit, insurance and investment based on climate outlooks">Scenario-based<br/>investment planning</div>
+          </div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-col">
+          <div class="flow-col-label">Value Outcomes</div>
+          <div class="flow-group">
+            <div class="flow-node node-green" data-tip="Timely planting, harvesting, and irrigation decisions guided by forecasts raise yields and reduce input waste per hectare">↑ Crop &amp; farm<br/>productivity</div>
+            <div class="flow-node node-green" data-tip="Early warnings enable preventive spraying, drainage, and livestock management ahead of disease-triggering weather conditions">↓ Disease &amp; hazard<br/>losses</div>
+            <div class="flow-node node-green" data-tip="Harvest and transport timing aligned with weather windows reduces post-harvest spoilage and supply chain disruption">↓ Perishable &amp;<br/>supply chain losses</div>
+            <div class="flow-node node-green" data-tip="Targeted forecast-led extension advice reduces blanket subsidy costs and improves food security outcomes per dollar of government spend">↓ Govt extension<br/>&amp; food security costs</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#1565c0;"></div>NMHS Services</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#80deea;border:1px solid #80deea"></div>Service Pillars</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#ffcc80;border:1px solid #ffcc80"></div>Decision Makers</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#ce93d8;border:1px solid #ce93d8"></div>Actions Taken</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#a5d6a7;border:1px solid #a5d6a7"></div>Value Outcomes</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Parameter Inputs — Farming <span class="card-subtitle">Annual estimates for national or regional agricultural sector</span></div>
+    <div class="inputs-grid">
+      <div class="input-group">
+        <label>Number of smallholder farm households</label>
+        <input type="number" id="a_farmers" value="250000" min="1" oninput="calcAqua()">
+        <span class="unit">households</span>
+      </div>
+      <div class="input-group">
+        <label>Average annual farm income per household</label>
+        <input type="number" id="a_income" value="3500" min="1" oninput="calcAqua()">
+        <span class="unit">USD per household</span>
+      </div>
+      <div class="input-group">
+        <label>Productivity gain from seasonal forecasts</label>
+        <input type="number" id="a_prod_gain" value="12" min="0" max="100" oninput="calcAqua()">
+        <span class="unit">% improvement in yield from optimised planting &amp; water management</span>
+      </div>
+      <div class="input-group">
+        <label>Annual crop losses (weather-related, baseline)</label>
+        <input type="number" id="a_crop_loss" value="15000000" min="0" oninput="calcAqua()">
+        <span class="unit">USD total sector per year</span>
+      </div>
+      <div class="input-group">
+        <label>Crop loss reduction from forecasts</label>
+        <input type="number" id="a_crop_reduce" value="28" min="0" max="100" oninput="calcAqua()">
+        <span class="unit">% reduction (disease, drought, flood warnings)</span>
+      </div>
+      <div class="input-group">
+        <label>Annual disease outbreak intervention cost</label>
+        <input type="number" id="a_disease_cost" value="3000000" min="0" oninput="calcAqua()">
+        <span class="unit">USD (government + farmer combined)</span>
+      </div>
+      <div class="input-group">
+        <label>Disease cost reduction from early warning</label>
+        <input type="number" id="a_disease_reduce" value="35" min="0" max="100" oninput="calcAqua()">
+        <span class="unit">% reduction from targeted forecasting interventions</span>
+      </div>
+      <div class="input-group">
+        <label>Annual perishable produce losses in transit</label>
+        <input type="number" id="a_perishable" value="5000000" min="0" oninput="calcAqua()">
+        <span class="unit">USD sector-wide per year</span>
+      </div>
+      <div class="input-group">
+        <label>Transit loss reduction from road weather intelligence</label>
+        <input type="number" id="a_perish_reduce" value="22" min="0" max="100" oninput="calcAqua()">
+        <span class="unit">% reduction from rerouting and schedule optimisation</span>
+      </div>
+      <div class="input-group">
+        <label>Government extension services budget</label>
+        <input type="number" id="a_extension" value="8000000" min="0" oninput="calcAqua()">
+        <span class="unit">USD per year (weather-related advisory services)</span>
+      </div>
+      <div class="input-group">
+        <label>Extension cost efficiency gain</label>
+        <input type="number" id="a_ext_reduce" value="15" min="0" max="100" oninput="calcAqua()">
+        <span class="unit">% savings from targeted, intelligence-led extension</span>
+      </div>
+    </div>
+    <hr class="divider">
+    <div class="card-title">Calculated Value — Farming</div>
+    <div class="results-grid" id="aqua-results"></div>
+    <div class="assumptions" id="aqua-assumptions"></div>
+    <div class="btn-row">
+      <button class="btn btn-export" onclick="exportSummary('aqua')">⬇ Export Summary</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- PAGE: HUMAN HEALTH                                           -->
+<!-- ============================================================ -->
+<section id="page-health" class="page">
+  <div class="card">
+    <div class="flex-between">
+      <div>
+        <span class="sector-badge badge-health">🏥 Human Health</span>
+        <div class="card-title">Prescriptive Model — Human Health Value Chain</div>
+      </div>
+    </div>
+    <div class="info-banner">
+      Weather and climate affect health through <strong>infectious disease spread</strong> (malaria, dengue, meningitis, diarrhoea), <strong>environmental impacts</strong> (heat stress, cold stress, air pollution, UV, pollen), and <strong>extreme event mortality</strong>. Weather-intelligent decisions reduce morbidity, hospitalisation, and welfare costs while maintaining a productive society.
+    </div>
+    <div class="flow-container">
+      <div class="flow-diagram">
+        <div class="flow-col">
+          <div class="flow-col-label">NMHS Services</div>
+          <div class="flow-group">
+            <div class="flow-node node-nmhs" data-tip="Temperature, humidity, UV, pollen, air quality forecasts">NMHS: Health-relevant<br/>Weather Forecasts<br/>&amp; Warnings</div>
+            <div class="flow-node node-blue" data-tip="Air quality monitoring and forecast systems">Air Quality<br/>Monitoring</div>
+            <div class="flow-node node-blue" data-tip="Climate data supporting disease vector modelling">Climate &amp;<br/>Epidemiological<br/>Data</div>
+          </div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-col">
+          <div class="flow-col-label">Health Intermediaries</div>
+          <div class="flow-group">
+            <div class="flow-node node-red" data-tip="Public health authorities issue heat alerts, disease warnings">Public Health<br/>Agencies</div>
+            <div class="flow-node node-teal" data-tip="Hospitals and clinics prepare for surge events">Hospitals &amp;<br/>Health Facilities</div>
+            <div class="flow-node node-teal" data-tip="Disease control programmes for malaria, dengue, etc.">Disease Control<br/>Programmes</div>
+            <div class="flow-node node-teal" data-tip="Industrial air quality regulators">Environmental<br/>Regulators</div>
+          </div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-col">
+          <div class="flow-col-label">At-Risk Groups</div>
+          <div class="flow-group">
+            <div class="flow-node node-amber" data-tip="Elderly, children, and immunocompromised at risk from heat/cold">Vulnerable<br/>Populations</div>
+            <div class="flow-node node-amber" data-tip="Workers exposed to outdoor conditions and pollution">Outdoor Workers<br/>&amp; Labour Force</div>
+            <div class="flow-node node-amber" data-tip="Communities in disease-endemic regions">Endemic Region<br/>Communities</div>
+            <div class="flow-node node-amber" data-tip="Hospitals planning for patient surges">Healthcare<br/>Planners</div>
+          </div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-col">
+          <div class="flow-col-label">Preventive Actions</div>
+          <div class="flow-group">
+            <div class="flow-node node-purple" data-tip="Issue heat health alerts; activate cooling centres">Issue heat/cold<br/>health alerts</div>
+            <div class="flow-node node-purple" data-tip="Target vector control (spraying, nets) using disease risk forecasts">Target vector<br/>control interventions</div>
+            <div class="flow-node node-purple" data-tip="Manage industrial processes to reduce pollution episodes">Reduce pollution<br/>exposure episodes</div>
+            <div class="flow-node node-purple" data-tip="Pre-position medical supplies and personnel ahead of events">Pre-position medical<br/>resources</div>
+          </div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-col">
+          <div class="flow-col-label">Value Outcomes</div>
+          <div class="flow-group">
+            <div class="flow-node node-green" data-tip="Heat alerts, air quality warnings, and cold snap advisories trigger interventions that prevent premature deaths in elderly and vulnerable populations">↓ Mortality &amp;<br/>premature deaths</div>
+            <div class="flow-node node-green" data-tip="Forecast-driven public health interventions and early treatment reduce avoidable emergency admissions and inpatient bed costs">↓ Hospitalisations<br/>&amp; healthcare costs</div>
+            <div class="flow-node node-green" data-tip="Timely vector control and outbreak response guided by weather and climate forecasts reduces the incidence and spread of climate-sensitive diseases">↓ Disease burden<br/>&amp; welfare costs</div>
+            <div class="flow-node node-green" data-tip="Fewer weather-related illness days and heat-induced work stoppages preserve economic productivity and reduce sick leave costs across the economy">↑ Workforce<br/>productivity</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#1565c0;"></div>NMHS Services</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#f48fb1;border:1px solid #f48fb1"></div>Health &amp; Emergency Agencies</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#ffcc80;border:1px solid #ffcc80"></div>At-Risk Groups</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#ce93d8;border:1px solid #ce93d8"></div>Preventive Actions</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#a5d6a7;border:1px solid #a5d6a7"></div>Value Outcomes</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Parameter Inputs — Human Health <span class="card-subtitle">Annual national or regional estimates across weather-sensitive health impacts</span></div>
+    <div class="inputs-grid">
+      <div class="input-group">
+        <label>Annual heat/cold stress hospitalisations (baseline)</label>
+        <input type="number" id="h_hosp_temp" value="8000" min="0" oninput="calcHealth()">
+        <span class="unit">hospital admissions per year</span>
+      </div>
+      <div class="input-group">
+        <label>Average cost per hospitalisation</label>
+        <input type="number" id="h_hosp_cost" value="3500" min="0" oninput="calcHealth()">
+        <span class="unit">USD (direct healthcare cost)</span>
+      </div>
+      <div class="input-group">
+        <label>Hospitalisation reduction from heat/cold alerts</label>
+        <input type="number" id="h_hosp_reduce" value="25" min="0" max="100" oninput="calcHealth()">
+        <span class="unit">% reduction from timely public health warnings</span>
+      </div>
+      <div class="input-group">
+        <label>Annual infectious disease cases (weather-sensitive)</label>
+        <input type="number" id="h_disease_cases" value="50000" min="0" oninput="calcHealth()">
+        <span class="unit">cases/year (malaria, dengue, diarrhoea, meningitis)</span>
+      </div>
+      <div class="input-group">
+        <label>Average treatment cost per case</label>
+        <input type="number" id="h_disease_cost" value="280" min="0" oninput="calcHealth()">
+        <span class="unit">USD per case (direct + indirect)</span>
+      </div>
+      <div class="input-group">
+        <label>Disease case reduction from forecast-led interventions</label>
+        <input type="number" id="h_disease_reduce" value="20" min="0" max="100" oninput="calcHealth()">
+        <span class="unit">% reduction from targeted vector control and early action</span>
+      </div>
+      <div class="input-group">
+        <label>Annual premature deaths (air pollution + weather, baseline)</label>
+        <input type="number" id="h_deaths" value="1200" min="0" oninput="calcHealth()">
+        <span class="unit">deaths per year</span>
+      </div>
+      <div class="input-group">
+        <label>Value of Statistical Life (VSL)</label>
+        <input type="number" id="h_vsl" value="500000" min="0" oninput="calcHealth()">
+        <span class="unit">USD (national VSL estimate)</span>
+      </div>
+      <div class="input-group">
+        <label>Premature death reduction from pollution forecasts</label>
+        <input type="number" id="h_death_reduce" value="8" min="0" max="100" oninput="calcHealth()">
+        <span class="unit">% reduction (manage industrial processes, reduce exposure)</span>
+      </div>
+      <div class="input-group">
+        <label>Workforce days lost to weather-related illness (baseline)</label>
+        <input type="number" id="h_workdays" value="3000000" min="0" oninput="calcHealth()">
+        <span class="unit">person-days per year</span>
+      </div>
+      <div class="input-group">
+        <label>GDP per worker per day</label>
+        <input type="number" id="h_gdp_day" value="65" min="0" step="0.5" oninput="calcHealth()">
+        <span class="unit">USD</span>
+      </div>
+      <div class="input-group">
+        <label>Workforce productivity recovery from health intelligence</label>
+        <input type="number" id="h_work_reduce" value="15" min="0" max="100" oninput="calcHealth()">
+        <span class="unit">% of lost days recovered through preventive action</span>
+      </div>
+    </div>
+    <hr class="divider">
+    <div class="card-title">Calculated Value — Human Health</div>
+    <div class="results-grid" id="health-results"></div>
+    <div class="assumptions" id="health-assumptions"></div>
+    <div class="btn-row">
+      <button class="btn btn-export" onclick="exportSummary('health')">⬇ Export Summary</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- PAGE: AVIATION                                               -->
+<!-- ============================================================ -->
+<section id="page-aviation" class="page">
+  <div class="card">
+    <div class="flex-between"><div>
+      <span class="sector-badge badge-aviation">✈️ Aviation</span>
+      <div class="card-title">Prescriptive Model — Aviation Value Chain</div>
+    </div></div>
+    <div class="info-banner">
+      Based on Von Grünigen et al. (2014) — TAF fuel/diversion methodology (<em>Weather, Climate, and Society</em>), extended to the full aviation value chain. Weather intelligence operates simultaneously at <strong>seasonal</strong> (fleet planning), <strong>medium-range</strong> (crew rostering), <strong>short-range TAF</strong> (fuel loading, alternates), and <strong>nowcast</strong> (ground/approach operations) timescales.
+    </div>
+    <div class="flow-container">
+      <div class="flow-diagram">
+        <div class="flow-col">
+          <div class="flow-col-label">NMHS Services</div>
+          <div class="flow-group">
+            <div class="flow-node node-nmhs" data-tip="METARs, TAFs, SIGMETs, low-level wind shear alerts, volcanic ash advisories (VAAC)">NMHS: METARs,<br/>TAFs, SIGMETs,<br/>Wind Shear &amp; VAAC</div>
+            <div class="flow-node node-blue" data-tip="World Area Forecast Centres provide en-route upper-air forecasts">World Area<br/>Forecast Centres<br/>(WAFCs)</div>
+          </div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-col">
+          <div class="flow-col-label">Air Navigation</div>
+          <div class="flow-group">
+            <div class="flow-node node-teal" data-tip="ANSPs and ATC manage airspace capacity, issue ground delay programmes">Air Navigation<br/>Service Providers<br/>(ANSPs / ATC)</div>
+            <div class="flow-node node-teal" data-tip="Airport operators manage slots, de-icing, terminal capacity">Airport<br/>Operators</div>
+          </div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-col">
+          <div class="flow-col-label">Operators</div>
+          <div class="flow-group">
+            <div class="flow-node node-amber" data-tip="Airlines use TAFs for fuel loading, alternate selection, route choice">Airlines &amp;<br/>Cargo Operators</div>
+            <div class="flow-node node-amber" data-tip="Dispatch and ops control manage schedule recovery during disruption">Airline Dispatch<br/>&amp; Ops Control</div>
+            <div class="flow-node node-amber" data-tip="Ground handlers manage de-icing, equipment protection, towing schedules">Ground Handlers<br/>&amp; De-icing Services</div>
+          </div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-col">
+          <div class="flow-col-label">Weather-Intelligent Actions</div>
+          <div class="flow-group">
+            <div class="flow-node node-purple" data-tip="Carry alternate fuel to avoid costly diversions — core Von Grünigen finding">Optimise fuel<br/>loading vs. diversion<br/>risk (TAF-based)</div>
+            <div class="flow-node node-purple" data-tip="Re-route around convective cells, turbulence, volcanic ash">Reroute around<br/>en-route hazards<br/>(SIGMETs)</div>
+            <div class="flow-node node-purple" data-tip="Pre-position de-icing teams; schedule slots around forecast conditions">Proactive de-icing<br/>&amp; slot management</div>
+            <div class="flow-node node-purple" data-tip="Issue ground delay programmes to absorb capacity constraints in advance">Issue ground<br/>delay programmes</div>
+          </div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-col">
+          <div class="flow-col-label">Value Outcomes</div>
+          <div class="flow-group">
+            <div class="flow-node node-green" data-tip="Accurate TAF forecasts enable fuel-optimal routing and reduce costly diversions to alternate airports with associated crew, catering, and rebooking expenses">↓ Fuel cost &amp;<br/>diversion costs</div>
+            <div class="flow-node node-green" data-tip="Better ground hold and gate management reduces airborne holding, passenger rebooking costs, crew overnight expenses, and slot penalties">↓ Weather-related<br/>delay costs</div>
+            <div class="flow-node node-green" data-tip="Precise icing forecasts enable targeted de-icing rather than precautionary treatment, reducing chemical, labour, and ground damage costs">↓ De-icing &amp;<br/>ground damage costs</div>
+            <div class="flow-node node-green" data-tip="Improved schedule integrity increases load factors, customer satisfaction, and slot efficiency at congested hub airports">↑ Cargo &amp; passenger<br/>on-time performance</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Parameter Inputs — Aviation <span class="card-subtitle">Based on Von Grünigen et al. (2014) methodology extended to full value chain</span></div>
+    <div class="inputs-grid">
+      <div class="input-group">
+        <label>Annual landings (IFR operations)</label>
+        <input type="number" id="av_landings" value="110000" min="1" oninput="calcAviation()">
+        <span class="unit">landings per year</span>
+      </div>
+      <div class="input-group">
+        <label>Average fuel cost saving per TAF-informed flight</label>
+        <input type="number" id="av_fuel_saving" value="145" min="0" step="5" oninput="calcAviation()">
+        <span class="unit">USD per flight (Von Grünigen baseline: $109–$164)</span>
+      </div>
+      <div class="input-group">
+        <label>Proportion of flights benefiting from TAF</label>
+        <input type="number" id="av_taf_frac" value="60" min="0" max="100" oninput="calcAviation()">
+        <span class="unit">% (Von Grünigen: ~60% of 110,000 landings)</span>
+      </div>
+      <div class="input-group">
+        <label>Annual weather-related diversions (baseline)</label>
+        <input type="number" id="av_diversions" value="800" min="0" oninput="calcAviation()">
+        <span class="unit">diversions per year</span>
+      </div>
+      <div class="input-group">
+        <label>Average cost per diversion</label>
+        <input type="number" id="av_div_cost" value="18000" min="0" oninput="calcAviation()">
+        <span class="unit">USD (fuel + crew + passenger compensation + slots)</span>
+      </div>
+      <div class="input-group">
+        <label>Diversion reduction from TAF quality</label>
+        <input type="number" id="av_div_reduce" value="40" min="0" max="100" oninput="calcAviation()">
+        <span class="unit">% reduction attributable to improved forecasts</span>
+      </div>
+      <div class="input-group">
+        <label>Annual weather-related delay (passenger-hours)</label>
+        <input type="number" id="av_delay_hours" value="1200000" min="0" oninput="calcAviation()">
+        <span class="unit">total passenger-hours delayed per year</span>
+      </div>
+      <div class="input-group">
+        <label>Value of passenger time</label>
+        <input type="number" id="av_vot" value="35" min="0" step="1" oninput="calcAviation()">
+        <span class="unit">USD per passenger-hour</span>
+      </div>
+      <div class="input-group">
+        <label>Delay reduction from ground delay programmes</label>
+        <input type="number" id="av_delay_reduce" value="22" min="0" max="100" oninput="calcAviation()">
+        <span class="unit">% delay reduction from proactive ANSP/airline coordination</span>
+      </div>
+      <div class="input-group">
+        <label>Annual de-icing and ground damage cost (baseline)</label>
+        <input type="number" id="av_deice_cost" value="4000000" min="0" oninput="calcAviation()">
+        <span class="unit">USD — reactive/unplanned de-icing and equipment damage</span>
+      </div>
+      <div class="input-group">
+        <label>Cost reduction from proactive de-icing scheduling</label>
+        <input type="number" id="av_deice_reduce" value="25" min="0" max="100" oninput="calcAviation()">
+        <span class="unit">% reduction from forecast-led pre-positioning</span>
+      </div>
+    </div>
+    <hr class="divider">
+    <div class="card-title">Calculated Value — Aviation</div>
+    <div class="results-grid" id="aviation-results"></div>
+    <div class="assumptions" id="aviation-assumptions"></div>
+    <div class="btn-row"><button class="btn btn-export" onclick="exportSummary('aviation')">⬇ Export Summary</button></div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- PAGE: ENERGY                                                 -->
+<!-- ============================================================ -->
+<section id="page-energy" class="page">
+  <div class="card">
+    <div class="flex-between"><div>
+      <span class="sector-badge badge-energy">⚡ Energy Sector</span>
+      <div class="card-title">Prescriptive Model — Energy Value Chain</div>
+    </div></div>
+    <div class="info-banner">
+      The energy sector is one of the most weather-sensitive yet least modelled in NMHS value assessments. Weather intelligence spans <strong>renewable generation forecasting</strong>, <strong>grid demand management</strong>, <strong>hydropower reservoir optimisation</strong>, and <strong>infrastructure protection</strong> — all creating quantifiable value for operators, consumers, and governments.
+    </div>
+    <div class="flow-container">
+      <div class="flow-diagram">
+        <div class="flow-col">
+          <div class="flow-col-label">NMHS Services</div>
+          <div class="flow-group">
+            <div class="flow-node node-nmhs" data-tip="Wind speed/direction, solar irradiance, temperature, precipitation, extreme event forecasts for energy sector">NMHS: Wind, Solar,<br/>Temperature &amp;<br/>Precip Forecasts</div>
+            <div class="flow-node node-blue" data-tip="Seasonal climate outlooks for reservoir management and demand planning">Seasonal Climate<br/>Outlooks &amp; Hydro<br/>Services</div>
+          </div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-col">
+          <div class="flow-col-label">Grid Operations</div>
+          <div class="flow-group">
+            <div class="flow-node node-teal" data-tip="TSOs use generation and demand forecasts to schedule dispatch and procure balancing reserves">Transmission<br/>System Operators<br/>(TSOs)</div>
+            <div class="flow-node node-teal" data-tip="Energy traders use weather forecasts to optimise market positions">Energy Market<br/>Operators &amp; Traders</div>
+          </div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-col">
+          <div class="flow-col-label">Generators &amp; Users</div>
+          <div class="flow-group">
+            <div class="flow-node node-amber" data-tip="Wind and solar operators optimise dispatch and schedule maintenance using forecasts">Renewable Energy<br/>Generators (Wind,<br/>Solar, Hydro)</div>
+            <div class="flow-node node-amber" data-tip="Thermal and storage operators manage dispatch and unit commitment">Thermal &amp;<br/>Storage Operators</div>
+            <div class="flow-node node-amber" data-tip="Large industrial users manage demand response using price and weather signals">Large Industrial<br/>Consumers &amp;<br/>Demand Response</div>
+          </div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-col">
+          <div class="flow-col-label">Weather-Intelligent Actions</div>
+          <div class="flow-group">
+            <div class="flow-node node-purple" data-tip="TSOs procure less expensive reserves when generation forecasts are accurate">Reduce balancing<br/>reserve procurement</div>
+            <div class="flow-node node-purple" data-tip="Hydro operators draw down or conserve reservoirs based on inflow forecasts">Optimise reservoir<br/>drawdown (hydro)</div>
+            <div class="flow-node node-purple" data-tip="Schedule maintenance in low-wind/low-sun periods to minimise lost generation">Schedule maintenance<br/>to minimise curtailment</div>
+            <div class="flow-node node-purple" data-tip="Pre-position crews and isolate vulnerable lines before storms">Infrastructure<br/>protection before<br/>severe weather</div>
+          </div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-col">
+          <div class="flow-col-label">Value Outcomes</div>
+          <div class="flow-group">
+            <div class="flow-node node-green" data-tip="Accurate generation forecasts allow TSOs to procure cheaper day-ahead reserves instead of expensive real-time balancing services">↓ Balancing &amp;<br/>reserve costs</div>
+            <div class="flow-node node-green" data-tip="Optimised dispatch, maintenance scheduling, and curtailment avoidance increase renewable energy yield per installed MW of capacity">↑ Renewable<br/>generation revenue</div>
+            <div class="flow-node node-green" data-tip="Early warning of storms and icing allows pre-positioning of crews and protective switching, reducing outage duration and restoration costs">↓ Outage costs &amp;<br/>repair expenditure</div>
+            <div class="flow-node node-green" data-tip="Lower system balancing costs and better capacity utilisation reduce the cost of electricity passed through to households and businesses">↓ Consumer<br/>electricity bills</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Parameter Inputs — Energy <span class="card-subtitle">Annual national or regional electricity system estimates</span></div>
+    <div class="inputs-grid">
+      <div class="input-group">
+        <label>Installed renewable capacity (wind + solar)</label>
+        <input type="number" id="en_capacity" value="5000" min="1" oninput="calcEnergy()">
+        <span class="unit">MW installed</span>
+      </div>
+      <div class="input-group">
+        <label>Annual generation from renewables</label>
+        <input type="number" id="en_generation" value="12000000" min="1" oninput="calcEnergy()">
+        <span class="unit">MWh per year</span>
+      </div>
+      <div class="input-group">
+        <label>Average wholesale electricity price</label>
+        <input type="number" id="en_price" value="65" min="1" step="1" oninput="calcEnergy()">
+        <span class="unit">USD per MWh</span>
+      </div>
+      <div class="input-group">
+        <label>Renewable curtailment rate (baseline)</label>
+        <input type="number" id="en_curtail" value="5" min="0" max="30" step="0.5" oninput="calcEnergy()">
+        <span class="unit">% of available generation curtailed</span>
+      </div>
+      <div class="input-group">
+        <label>Curtailment reduction from better forecasts</label>
+        <input type="number" id="en_curtail_reduce" value="40" min="0" max="100" oninput="calcEnergy()">
+        <span class="unit">% reduction from improved wind/solar forecasting</span>
+      </div>
+      <div class="input-group">
+        <label>Annual grid balancing cost (baseline)</label>
+        <input type="number" id="en_balancing" value="50000000" min="0" oninput="calcEnergy()">
+        <span class="unit">USD per year (reserve procurement + imbalance)</span>
+      </div>
+      <div class="input-group">
+        <label>Balancing cost reduction from forecast accuracy</label>
+        <input type="number" id="en_bal_reduce" value="20" min="0" max="100" oninput="calcEnergy()">
+        <span class="unit">% reduction attributable to improved generation forecasts</span>
+      </div>
+      <div class="input-group">
+        <label>Annual weather-related outage cost</label>
+        <input type="number" id="en_outage" value="30000000" min="0" oninput="calcEnergy()">
+        <span class="unit">USD — repair costs + consumer outage costs</span>
+      </div>
+      <div class="input-group">
+        <label>Outage cost reduction from advance warnings</label>
+        <input type="number" id="en_out_reduce" value="30" min="0" max="100" oninput="calcEnergy()">
+        <span class="unit">% reduction from infrastructure protection &amp; crew pre-positioning</span>
+      </div>
+      <div class="input-group">
+        <label>Hydropower annual generation</label>
+        <input type="number" id="en_hydro" value="8000000" min="0" oninput="calcEnergy()">
+        <span class="unit">MWh per year</span>
+      </div>
+      <div class="input-group">
+        <label>Hydro revenue gain from inflow forecast optimisation</label>
+        <input type="number" id="en_hydro_gain" value="5" min="0" max="30" step="0.5" oninput="calcEnergy()">
+        <span class="unit">% improvement in reservoir value from seasonal forecasts</span>
+      </div>
+    </div>
+    <hr class="divider">
+    <div class="card-title">Calculated Value — Energy</div>
+    <div class="results-grid" id="energy-results"></div>
+    <div class="assumptions" id="energy-assumptions"></div>
+    <div class="btn-row"><button class="btn btn-export" onclick="exportSummary('energy')">⬇ Export Summary</button></div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- PAGE: BANKING                                                -->
+<!-- ============================================================ -->
+<section id="page-banking" class="page">
+  <div class="card">
+    <div class="flex-between"><div>
+      <span class="sector-badge badge-banking">🏦 Banking Sector</span>
+      <div class="card-title">Prescriptive Model — Banking Value Chain</div>
+    </div></div>
+    <div class="info-banner">
+      Banks are weather-sensitive at second order — through the credit risk of their loan portfolios across weather-exposed sectors. Weather-intelligent lending reduces NPL rates, improves capital adequacy, and enables financial inclusion through <strong>weather-indexed loan products</strong> for previously unbankable smallholder and coastal borrowers.
+    </div>
+    <div class="flow-container">
+      <div class="flow-diagram">
+        <div class="flow-col">
+          <div class="flow-col-label">NMHS Services</div>
+          <div class="flow-group">
+            <div class="flow-node node-nmhs" data-tip="Long-range climate scenario data informs multi-year credit risk modelling and portfolio stress testing">NMHS: Climate<br/>Scenario Data</div>
+            <div class="flow-node node-blue" data-tip="Historical flood, drought, and extreme weather records calibrate borrower default probability models">Historical<br/>Extremes Datasets</div>
+            <div class="flow-node node-blue" data-tip="3–6 month climate outlooks used to anticipate seasonal credit stress in agriculture, fisheries, and construction portfolios">Seasonal<br/>Outlooks</div>
+          </div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-col">
+          <div class="flow-col-label">Intermediaries</div>
+          <div class="flow-group">
+            <div class="flow-node node-teal" data-tip="Incorporate climate risk into borrower credit ratings and sector-level risk adjustments">Credit Rating<br/>Agencies</div>
+            <div class="flow-node node-teal" data-tip="Basel III/IV climate risk requirements; central bank climate stress testing frameworks (e.g. NGFS scenarios)">Prudential<br/>Regulators</div>
+            <div class="flow-node node-teal" data-tip="Probabilistic loss modelling for extreme weather events across loan collateral portfolios">Catastrophe<br/>Modellers</div>
+          </div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-col">
+          <div class="flow-col-label">Decision Makers</div>
+          <div class="flow-group">
+            <div class="flow-node node-amber" data-tip="Frontline credit decisions incorporating weather exposure of borrower activities and collateral location">Loan Officers &amp;<br/>Risk Managers</div>
+            <div class="flow-node node-amber" data-tip="Portfolio-level climate risk oversight; capital allocation, provisioning decisions, and TCFD reporting">Chief Risk<br/>Officers</div>
+            <div class="flow-node node-amber" data-tip="TCFD, CSRD and central bank climate disclosure reporting; climate stress test submissions to regulators">Regulatory<br/>Compliance Teams</div>
+          </div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-col">
+          <div class="flow-col-label">Weather-Intelligent Actions</div>
+          <div class="flow-group">
+            <div class="flow-node node-purple" data-tip="Adjust loan-to-value ratios, interest rates, and repayment schedules based on climate exposure of borrower activities">Climate-adjust<br/>credit terms</div>
+            <div class="flow-node node-purple" data-tip="Set aside capital provisions anticipating weather-driven default increases during adverse climate seasons">Build climate<br/>provisions</div>
+            <div class="flow-node node-purple" data-tip="Run scenario analyses against drought, flood, and cyclone events to quantify portfolio climate vulnerability">Stress-test<br/>portfolios</div>
+            <div class="flow-node node-purple" data-tip="Trigger automatic repayment deferrals when certified NMHS data confirms threshold weather events affecting borrowers">Activate index<br/>repayment relief</div>
+          </div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-col">
+          <div class="flow-col-label">Value Outcomes</div>
+          <div class="flow-group">
+            <div class="flow-node node-green" data-tip="Fewer non-performing loans as borrowers are better prepared for weather impacts and credit terms reflect actual risk">↓ NPL rates in<br/>climate-exposed<br/>portfolios</div>
+            <div class="flow-node node-green" data-tip="Weather-indexed loan products extend credit to previously unbankable smallholder farmers and coastal fishers">↑ Financial<br/>inclusion via<br/>index products</div>
+            <div class="flow-node node-green" data-tip="Standardised NMHS data streams reduce cost and effort of climate risk disclosure and stress testing">↑ Regulatory<br/>compliance</div>
+            <div class="flow-node node-green" data-tip="Early warning triggers proactive portfolio management before disaster events materialise into defaults">↓ Post-disaster<br/>default spikes</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Parameter Inputs — Banking <span class="card-subtitle">National or regional banking sector estimates</span></div>
+    <div class="inputs-grid">
+      <div class="input-group">
+        <label data-tip="Total outstanding loan book exposed to weather-sensitive sectors: agriculture, fisheries, construction, energy, tourism">Weather-exposed loan portfolio size</label>
+        <input type="number" id="b_portfolio" value="500000000" min="1" oninput="calcBanking()">
+        <span class="unit">USD</span>
+      </div>
+      <div class="input-group">
+        <label data-tip="Current non-performing loan rate in the weather-exposed portion of the portfolio, before weather-intelligent interventions">Baseline NPL rate in weather-exposed portfolio</label>
+        <input type="number" id="b_npl_rate" value="8" min="0" max="100" oninput="calcBanking()">
+        <span class="unit">% per year</span>
+      </div>
+      <div class="input-group">
+        <label data-tip="Reduction in NPL rate attributable to weather-adjusted credit terms, early warning triggers, and climate-informed underwriting">NPL reduction from weather-intelligent lending</label>
+        <input type="number" id="b_npl_reduction" value="25" min="0" max="100" oninput="calcBanking()">
+        <span class="unit">% reduction attributable to weather intelligence</span>
+      </div>
+      <div class="input-group">
+        <label data-tip="Total provisions set aside annually for expected credit losses in weather-sensitive sectors">Annual provisioning cost on weather-exposed portfolio</label>
+        <input type="number" id="b_provision_cost" value="20000000" min="1" oninput="calcBanking()">
+        <span class="unit">USD per year</span>
+      </div>
+      <div class="input-group">
+        <label data-tip="Reduction in provisioning requirement from proactive portfolio management before adverse weather seasons materialise">Provisioning cost reduction from early warning</label>
+        <input type="number" id="b_provision_reduction" value="20" min="0" max="100" oninput="calcBanking()">
+        <span class="unit">% reduction from proactive portfolio management</span>
+      </div>
+      <div class="input-group">
+        <label data-tip="Value of new loans that become viable through weather-indexed repayment structures reducing lender risk for previously unbankable borrowers">New loans enabled by weather-indexed products</label>
+        <input type="number" id="b_new_loans" value="50000000" min="0" oninput="calcBanking()">
+        <span class="unit">USD new loan portfolio annually</span>
+      </div>
+      <div class="input-group">
+        <label>Revenue from newly-banked clients</label>
+        <input type="number" id="b_inclusion_return" value="3" min="0" max="100" oninput="calcBanking()">
+        <span class="unit">% net interest margin on new loans</span>
+      </div>
+      <div class="input-group">
+        <label>Regulatory climate compliance cost baseline</label>
+        <input type="number" id="b_compliance_cost" value="5000000" min="0" oninput="calcBanking()">
+        <span class="unit">USD per year</span>
+      </div>
+      <div class="input-group">
+        <label>Compliance cost efficiency gain</label>
+        <input type="number" id="b_compliance_reduction" value="15" min="0" max="100" oninput="calcBanking()">
+        <span class="unit">% reduction from standardised NMHS data</span>
+      </div>
+    </div>
+    <hr class="divider">
+    <div class="card-title">Calculated Value — Banking</div>
+    <div class="results-grid" id="banking-results"></div>
+    <div class="assumptions" id="banking-assumptions"></div>
+    <div class="btn-row"><button class="btn btn-export" onclick="exportSummary('banking')">⬇ Export Summary</button></div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- PAGE: CONSTRUCTION                                            -->
+<!-- ============================================================ -->
+<section id="page-construction" class="page">
+  <div class="card">
+    <div class="flex-between"><div>
+      <span class="sector-badge badge-construction">🏗️ Construction Sector</span>
+      <div class="card-title">Prescriptive Model — Construction Value Chain</div>
+    </div></div>
+    <div class="info-banner">
+      Construction is governed by precise meteorological thresholds — concrete pours, crane operations, asphalt laying, and worker safety all have specific weather limits. NMHS-certified records also serve as <strong>legal evidence</strong> for force majeure claims and insurance disputes.
+    </div>
+    <div class="flow-container">
+      <div class="flow-diagram">
+        <div class="flow-col">
+          <div class="flow-col-label">NMHS Services</div>
+          <div class="flow-group">
+            <div class="flow-node node-nmhs" data-tip="Hour-by-hour forecasts for temperature, wind speed, precipitation, and lightning risk at specific construction sites">NMHS: Site-Specific<br/>Hourly Forecasts</div>
+            <div class="flow-node node-blue" data-tip="Legally admissible weather records for force majeure claims, insurance disputes, and contract time extensions">Certified Station<br/>Records</div>
+            <div class="flow-node node-blue" data-tip="Multi-month outlooks for scheduling major pours, earthworks, and commissioning phases around seasonal weather risk">Seasonal Climate<br/>Outlooks</div>
+          </div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-col">
+          <div class="flow-col-label">Intermediaries</div>
+          <div class="flow-group">
+            <div class="flow-node node-teal" data-tip="Specialist meteorologists translating forecasts into site-specific thresholds for safe and compliant operations">Engineering<br/>Meteorologists</div>
+            <div class="flow-node node-teal" data-tip="Enforce weather-based work stoppages: WBGT heat thresholds, lightning exclusion zones, wind speed crane limits">Safety<br/>Regulators</div>
+            <div class="flow-node node-teal" data-tip="Project lenders require weather risk management plans as a condition of construction finance facilities">Project Finance<br/>Banks</div>
+          </div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-col">
+          <div class="flow-col-label">Decision Makers</div>
+          <div class="flow-group">
+            <div class="flow-node node-amber" data-tip="Make real-time scheduling decisions on pours, crane lifts, and worker deployment based on hourly forecasts">Site Managers &amp;<br/>Engineers</div>
+            <div class="flow-node node-amber" data-tip="Monitor WBGT index and lightning risk to enforce mandatory stand-downs and site evacuation protocols">Health &amp; Safety<br/>Officers</div>
+            <div class="flow-node node-amber" data-tip="Coordinate material deliveries and equipment positioning around weather windows to avoid delays and damage">Procurement &amp;<br/>Logistics</div>
+            <div class="flow-node node-amber" data-tip="Document weather events with certified station data to support insurance claims and contractual time extensions">Insurance &amp;<br/>Contract Teams</div>
+          </div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-col">
+          <div class="flow-col-label">Weather-Intelligent Actions</div>
+          <div class="flow-group">
+            <div class="flow-node node-purple" data-tip="Tower and mobile crane operations restricted by wind speed; weather windows enable maximum utilisation with fewer weather standdowns">Schedule crane<br/>lifts on low-wind<br/>windows</div>
+            <div class="flow-node node-purple" data-tip="Concrete placement requires temperature, humidity, and wind within specification; poor conditions cause defects and rework">Advance/defer<br/>concrete pours</div>
+            <div class="flow-node node-purple" data-tip="Wet Bulb Globe Temperature index triggers mandatory rest periods and work stoppages to prevent heat illness and fatalities">Enforce WBGT heat<br/>stand-downs</div>
+            <div class="flow-node node-purple" data-tip="NMHS-certified weather records provide legally admissible evidence for contract time extensions and force majeure claims">Invoke force<br/>majeure with<br/>certified records</div>
+          </div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-col">
+          <div class="flow-col-label">Value Outcomes</div>
+          <div class="flow-group">
+            <div class="flow-node node-green" data-tip="Fewer weather-related delays and rework events reduce outturn cost against contract value">↓ Project cost<br/>overruns</div>
+            <div class="flow-node node-green" data-tip="Proactive stand-downs prevent occupational injuries and fatalities, reducing liability and insurance costs">↓ Worker heat/<br/>lightning incidents</div>
+            <div class="flow-node node-green" data-tip="Weather-appropriate placement of concrete, asphalt, and coatings reduces defect rates and rework expenditure">↓ Rework &amp;<br/>defect costs</div>
+            <div class="flow-node node-green" data-tip="Certified weather records resolve force majeure and extension-of-time disputes efficiently, avoiding litigation">↓ Claims<br/>disputes</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Parameter Inputs — Construction <span class="card-subtitle">National or regional construction sector estimates</span></div>
+    <div class="inputs-grid">
+      <div class="input-group">
+        <label data-tip="Total active construction projects in the national or regional portfolio being assessed">Number of construction projects per year</label>
+        <input type="number" id="c_projects" value="50" min="1" oninput="calcConstruction()">
+        <span class="unit">projects per year</span>
+      </div>
+      <div class="input-group">
+        <label data-tip="Mean contract value per project; used to calculate total portfolio exposure to weather-related delay and rework costs">Average project value</label>
+        <input type="number" id="c_project_value" value="10000000" min="1" oninput="calcConstruction()">
+        <span class="unit">USD per project</span>
+      </div>
+      <div class="input-group">
+        <label data-tip="Percentage of project value typically lost to weather-related delays: unplanned stoppages, standing time, and programme extensions">Weather-related delay cost (baseline)</label>
+        <input type="number" id="c_delay_pct" value="12" min="0" max="100" oninput="calcConstruction()">
+        <span class="unit">% of project value</span>
+      </div>
+      <div class="input-group">
+        <label data-tip="Reduction in weather delay achievable through proactive scheduling using site-specific hourly forecasts and threshold alerts">Delay reduction from weather-intelligent scheduling</label>
+        <input type="number" id="c_delay_reduction" value="35" min="0" max="100" oninput="calcConstruction()">
+        <span class="unit">% reduction from improved forecasting</span>
+      </div>
+      <div class="input-group">
+        <label data-tip="Percentage of project value attributed to rework caused by placing concrete, asphalt, or coatings in unsuitable weather conditions">Rework cost from weather defects (baseline)</label>
+        <input type="number" id="c_rework_pct" value="3" min="0" max="100" oninput="calcConstruction()">
+        <span class="unit">% of project value</span>
+      </div>
+      <div class="input-group">
+        <label data-tip="Reduction in rework from enforcing meteorological thresholds: temperature, humidity, wind, and curing conditions">Rework reduction from threshold-calibrated operations</label>
+        <input type="number" id="c_rework_reduction" value="40" min="0" max="100" oninput="calcConstruction()">
+        <span class="unit">% reduction from proper scheduling</span>
+      </div>
+      <div class="input-group">
+        <label data-tip="Baseline number of occupational incidents per year attributable to weather: heat illness, lightning strikes, wind-related accidents">Annual worker weather-related incidents</label>
+        <input type="number" id="c_incident_count" value="20" min="0" oninput="calcConstruction()">
+        <span class="unit">incidents per year (baseline)</span>
+      </div>
+      <div class="input-group">
+        <label data-tip="Average cost per weather-related incident including medical treatment, lost-time wages, investigation, and liability costs">Cost per incident</label>
+        <input type="number" id="c_incidents" value="150000" min="1" oninput="calcConstruction()">
+        <span class="unit">USD (medical, lost time, liability)</span>
+      </div>
+      <div class="input-group">
+        <label data-tip="Reduction in incident frequency from WBGT monitoring, automated lightning warning systems, and proactive stand-down protocols">Incident reduction from WBGT and lightning systems</label>
+        <input type="number" id="c_incident_reduction" value="45" min="0" max="100" oninput="calcConstruction()">
+        <span class="unit">% reduction from early warning</span>
+      </div>
+      <div class="input-group">
+        <label data-tip="Builder's All Risk (BAR) premium covering the construction project portfolio against weather-related damage, delay, and liability">Annual Builder's All Risk insurance premium</label>
+        <input type="number" id="c_insurance" value="8000000" min="1" oninput="calcConstruction()">
+        <span class="unit">USD per year</span>
+      </div>
+      <div class="input-group">
+        <label data-tip="Premium discount negotiated with insurers based on verified weather risk management programme including certified NMHS data integration">Insurance premium reduction from certified weather risk management</label>
+        <input type="number" id="c_insurance_reduction" value="10" min="0" max="100" oninput="calcConstruction()">
+        <span class="unit">% reduction from verified risk management</span>
+      </div>
+    </div>
+    <hr class="divider">
+    <div class="card-title">Calculated Value — Construction</div>
+    <div class="results-grid" id="construction-results"></div>
+    <div class="assumptions" id="construction-assumptions"></div>
+    <div class="btn-row"><button class="btn btn-export" onclick="exportSummary('construction')">⬇ Export Summary</button></div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- PAGE: WATER RESOURCE MANAGEMENT                              -->
+<!-- ============================================================ -->
+<section id="page-wrm" class="page">
+  <div class="card">
+    <div class="flex-between"><div>
+      <span class="sector-badge badge-wrm">&#128167; Water Resource Management</span>
+      <div class="card-title">Prescriptive Model — Water Resource Management Value Chain</div>
+    </div></div>
+    <div class="info-banner">
+      Water resource management sits at the intersection of the energy, farming, health, and disaster management sectors. Seasonal precipitation outlooks, flood warnings, and evapotranspiration indices enable reservoir operators, hydropower schedulers, irrigation managers, and water utilities to make <strong>allocation decisions that balance competing demands</strong>. This sector is of particular importance in water-stressed economies and countries where hydropower dominates electricity generation — including sub-Saharan Africa, South Asia, and the Andean region.
+    </div>
+    <div class="flow-container">
+      <div class="flow-diagram">
+        <div class="flow-col">
+          <div class="flow-col-label">NMHS Services</div>
+          <div class="flow-group">
+            <div class="flow-node node-nmhs" data-tip="Multi-month probabilistic outlooks for seasonal rainfall totals, river inflow volumes, and snowmelt timing — enabling forward planning of reservoir storage targets and release schedules">Seasonal Precipitation<br/>&amp; Snowpack Outlooks</div>
+            <div class="flow-node node-blue" data-tip="Probabilistic short-range flood guidance for river basins, enabling pre-emptive reservoir pre-release before flood peak arrival — protecting downstream communities while preserving storage">Flood Forecasts<br/>&amp; River Warnings</div>
+            <div class="flow-node node-blue" data-tip="Daily and weekly evapotranspiration indices enabling precision irrigation scheduling and soil moisture monitoring for water utilities">Evapotranspiration<br/>Indices &amp; SPI</div>
+          </div>
+        </div>
+        <div class="flow-arrow">&#8594;</div>
+        <div class="flow-col">
+          <div class="flow-col-label">Intermediaries</div>
+          <div class="flow-group">
+            <div class="flow-node node-teal" data-tip="Multi-disciplinary teams that translate NMHS hydrometeorological forecasts into catchment-specific inflow projections, flood routing guidance, and reservoir yield scenarios">Hydrological Modellers<br/>&amp; Basin Authorities</div>
+            <div class="flow-node node-teal" data-tip="National drought monitoring agencies that aggregate SPI, NDVI, and reservoir anomaly data to trigger pre-crisis demand management and rationing protocols">National Drought<br/>Monitor Agencies</div>
+            <div class="flow-node node-teal" data-tip="Grid operators and energy trading desks that use river flow outlooks to schedule hydropower dispatch and balance intermittent renewable generation">Grid Operators &amp;<br/>Energy Traders</div>
+          </div>
+        </div>
+        <div class="flow-arrow">&#8594;</div>
+        <div class="flow-col">
+          <div class="flow-col-label">Decision Makers</div>
+          <div class="flow-group">
+            <div class="flow-node node-amber" data-tip="Responsible for day-to-day release scheduling, dam safety, spillway management, and multi-year storage strategy across hydropower and water supply reservoirs">Reservoir &amp; Dam<br/>Operators</div>
+            <div class="flow-node node-amber" data-tip="Municipal water utilities and rural water scheme managers that use seasonal outlooks to plan treatment capacity, source switching, and demand management for drinking water supply">Water Utility<br/>Managers</div>
+            <div class="flow-node node-amber" data-tip="Irrigation scheme managers and water user associations that allocate water resources across farming communities — typically the largest demand on river basin flows">Irrigation Scheme<br/>Managers &amp; WUAs</div>
+            <div class="flow-node node-amber" data-tip="Multi-sector basin governance bodies that arbitrate competing water allocation claims between hydropower, agriculture, municipalities, and environmental flows">Water Governance<br/>Bodies</div>
+          </div>
+        </div>
+        <div class="flow-arrow">&#8594;</div>
+        <div class="flow-col">
+          <div class="flow-col-label">Weather-Intelligent Actions</div>
+          <div class="flow-group">
+            <div class="flow-node node-purple" data-tip="Seasonal inflow forecasts enable reservoir operators to hold higher storage targets ahead of wet seasons and draw-down pre-emptively before forecast flood peaks, optimising yield and safety simultaneously">Optimise reservoir<br/>storage targets<br/>for season</div>
+            <div class="flow-node node-purple" data-tip="FAO-56 evapotranspiration forecasts reduce over-irrigation by scheduling releases only when crop water demand exceeds soil moisture — saving water and pumping energy">Schedule irrigation<br/>releases on ET<br/>forecasts</div>
+            <div class="flow-node node-purple" data-tip="Seasonal drought outlooks trigger tiered demand management and rationing protocols weeks before reservoirs reach critical thresholds — avoiding crisis-level shortages">Activate drought<br/>demand management<br/>early</div>
+            <div class="flow-node node-purple" data-tip="7-14 day river flow outlooks allow hydropower schedulers to time peak generation to high-tariff periods, maximising revenue while maintaining reservoir operating rules">Schedule hydro<br/>generation to<br/>peak tariff windows</div>
+          </div>
+        </div>
+        <div class="flow-arrow">&#8594;</div>
+        <div class="flow-col">
+          <div class="flow-col-label">Value Outcomes</div>
+          <div class="flow-group">
+            <div class="flow-node node-green" data-tip="Better seasonal inflow forecasting increases the proportion of storage reliably available, reducing spill waste in wet seasons and shortage penalties in dry seasons">&#8593; Reservoir yield<br/>&amp; supply reliability</div>
+            <div class="flow-node node-green" data-tip="Hydropower generation timed to peak demand and tariff periods maximises revenue per unit of water released">&#8593; Hydropower<br/>revenue per m&#179;</div>
+            <div class="flow-node node-green" data-tip="Pre-emptive demand management and source switching activated weeks ahead of crisis avoids costly emergency water procurement and economic costs of supply interruption">&#8595; Emergency water<br/>supply costs</div>
+            <div class="flow-node node-green" data-tip="ET-scheduled irrigation reduces over-application, lowering pumping energy costs and abstraction volumes — improving water productivity for farmers">&#8595; Irrigation water<br/>waste &amp; cost</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Parameter Inputs — Water Resource Management <span class="card-subtitle">National or regional estimates</span></div>
+    <div class="inputs-grid">
+      <div class="input-group">
+        <label data-tip="Total installed hydropower generation capacity in the country or region — used to estimate the value of weather-optimised dispatch timing">Installed hydropower capacity</label>
+        <input type="number" id="w_hydro_mw" value="2000" min="1" oninput="calcWRM()">
+        <span class="unit">MW installed capacity</span>
+      </div>
+      <div class="input-group">
+        <label data-tip="Average revenue per MWh of hydropower generated — used to calculate the financial uplift from scheduling generation to higher-value peak tariff periods">Average hydropower tariff</label>
+        <input type="number" id="w_tariff" value="80" min="1" oninput="calcWRM()">
+        <span class="unit">USD per MWh</span>
+      </div>
+      <div class="input-group">
+        <label data-tip="Percentage uplift in effective annual generation value from weather-intelligent scheduling: timing peak generation to high-tariff windows, avoiding spillage, and maintaining storage through forecast inflows">Revenue gain from weather-intelligent hydro dispatch</label>
+        <input type="number" id="w_hydro_gain" value="8" min="0" max="50" step="0.5" oninput="calcWRM()">
+        <span class="unit">% annual value uplift</span>
+      </div>
+      <div class="input-group">
+        <label data-tip="Total irrigated area covered by the water resource system — used to estimate savings from reduced over-irrigation through ET-based scheduling">Total irrigated agricultural area</label>
+        <input type="number" id="w_irrigated_ha" value="500000" min="1" oninput="calcWRM()">
+        <span class="unit">hectares</span>
+      </div>
+      <div class="input-group">
+        <label data-tip="Average cost of irrigation water per hectare per year, including pumping, distribution, and abstraction costs">Average irrigation cost per hectare</label>
+        <input type="number" id="w_irr_cost_ha" value="120" min="1" oninput="calcWRM()">
+        <span class="unit">USD per hectare per year</span>
+      </div>
+      <div class="input-group">
+        <label data-tip="Percentage reduction in irrigation water use achievable through ET-scheduled releases — typically 10-20% by eliminating unnecessary applications">Irrigation water saving from ET scheduling</label>
+        <input type="number" id="w_irr_saving" value="15" min="0" max="40" oninput="calcWRM()">
+        <span class="unit">% reduction in over-irrigation</span>
+      </div>
+      <div class="input-group">
+        <label data-tip="Annual expenditure on emergency water supply measures: tankering, emergency borehole drilling, purchased desalination, or alternative source procurement during drought events">Annual emergency water supply costs (baseline)</label>
+        <input type="number" id="w_emergency_cost" value="10000000" min="0" oninput="calcWRM()">
+        <span class="unit">USD per year</span>
+      </div>
+      <div class="input-group">
+        <label data-tip="Percentage reduction in emergency spending achievable through early activation of demand management driven by seasonal drought outlooks rather than crisis-reactive response">Reduction in emergency costs from early warning</label>
+        <input type="number" id="w_emergency_reduction" value="40" min="0" max="80" oninput="calcWRM()">
+        <span class="unit">% reduction from proactive drought management</span>
+      </div>
+      <div class="input-group">
+        <label data-tip="Annual economic damage from river floods affecting infrastructure, agriculture, and property — used to estimate savings from weather-intelligent pre-release and flood warning">Annual flood damage (baseline)</label>
+        <input type="number" id="w_flood_damage" value="50000000" min="0" oninput="calcWRM()">
+        <span class="unit">USD per year</span>
+      </div>
+      <div class="input-group">
+        <label data-tip="Percentage of flood damage avoidable through reservoir pre-release operations, flood early warning, and advance community preparedness enabled by NMHS flood guidance">Flood damage reduction from reservoir management &amp; warning</label>
+        <input type="number" id="w_flood_reduction" value="25" min="0" max="60" oninput="calcWRM()">
+        <span class="unit">% reduction from improved forecasting</span>
+      </div>
+    </div>
+    <hr class="divider">
+    <div class="card-title">Calculated Value — Water Resource Management</div>
+    <div class="results-grid" id="wrm-results"></div>
+    <div class="assumptions" id="wrm-assumptions"></div>
+    <div class="btn-row"><button class="btn btn-export" onclick="exportSummary('wrm')">&#8595; Export Summary</button></div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- PAGE: TOURISM                                                 -->
+<!-- ============================================================ -->
+<section id="page-tourism" class="page">
+  <div class="card">
+    <div class="flex-between"><div>
+      <span class="sector-badge badge-tourism">&#127958; Tourism Sector</span>
+      <div class="card-title">Prescriptive Model — Tourism Value Chain</div>
+    </div></div>
+    <div class="info-banner">
+      Tourism is highly sensitive to weather across every stage of the visitor journey — from destination selection through activity participation to emergency response. NMHS forecasts and warnings enable tour operators, resort managers, and national tourism boards to <strong>protect visitor safety</strong>, reduce liability exposure, and optimise high-value seasonal capacity. This sector is of particular relevance to <strong>Small Island Developing States (SIDS)</strong>, where tourism is often the dominant contributor to GDP.
+    </div>
+    <div class="flow-container">
+      <div class="flow-diagram">
+        <div class="flow-col">
+          <div class="flow-col-label">NMHS Services</div>
+          <div class="flow-group">
+            <div class="flow-node node-nmhs" data-tip="Point-specific 7-day forecasts for temperature, rainfall, UV index, and sea conditions at tourism destinations, enabling operators to plan activities with confidence">Destination<br/>Weather Forecasts</div>
+            <div class="flow-node node-blue" data-tip="Real-time wave heights, sea temperature, and visibility for beaches, dive sites, and marine excursions — critical for water-based activity safety">Marine &amp; Beach<br/>Condition Alerts</div>
+            <div class="flow-node node-blue" data-tip="Seasonal outlooks informing accommodation pricing, staffing levels, and event scheduling around peak and shoulder weather windows">Seasonal Climate<br/>Outlooks</div>
+          </div>
+        </div>
+        <div class="flow-arrow">&#8594;</div>
+        <div class="flow-col">
+          <div class="flow-col-label">Intermediaries</div>
+          <div class="flow-group">
+            <div class="flow-node node-teal" data-tip="Package and adventure tour operators adjust itineraries, rebook excursions, and communicate weather risk to guests based on destination forecasts">Tour Operators &amp;<br/>Travel Agencies</div>
+            <div class="flow-node node-teal" data-tip="Government tourism promotion agencies use seasonal outlooks to target marketing spend and manage visitor expectations around weather risk">National Tourism<br/>Boards</div>
+            <div class="flow-node node-teal" data-tip="Insurers underwriting travel, activity liability, and cancellation policies use NMHS data to price risk and adjudicate claims for weather-related trip disruption">Insurance<br/>Underwriters</div>
+          </div>
+        </div>
+        <div class="flow-arrow">&#8594;</div>
+        <div class="flow-col">
+          <div class="flow-col-label">Decision Makers</div>
+          <div class="flow-group">
+            <div class="flow-node node-amber" data-tip="Use forecasts to pre-position staff, pre-warn guests, adjust pool/beach operations, and activate emergency protocols before extreme weather arrives">Resort &amp; Hotel<br/>Managers</div>
+            <div class="flow-node node-amber" data-tip="Water sports, diving, hiking, and adventure operators depend on condition forecasts to apply go/no-go thresholds for guest safety and liability management">Activity &amp; Excursion<br/>Providers</div>
+            <div class="flow-node node-amber" data-tip="Ground transfer operators and ferry services adjust schedules based on wind, rainfall, and visibility forecasts to avoid weather-related accidents and delays">Ground Transport<br/>&amp; Ferry Operators</div>
+            <div class="flow-node node-amber" data-tip="Outdoor festivals, sporting events, and cultural experiences use forecasts to activate contingency plans and communicate with attendees ahead of adverse weather">Event &amp; Festival<br/>Organisers</div>
+          </div>
+        </div>
+        <div class="flow-arrow">&#8594;</div>
+        <div class="flow-col">
+          <div class="flow-col-label">Weather-Intelligent Actions</div>
+          <div class="flow-group">
+            <div class="flow-node node-purple" data-tip="Advance weather intelligence allows substitution of safe alternative activities, minimising revenue loss while protecting guest safety during adverse conditions">Reschedule<br/>activities around<br/>weather windows</div>
+            <div class="flow-node node-purple" data-tip="Pre-arrival weather communication reduces no-show disputes, manages guest expectations, and increases satisfaction scores for weather-neutral experiences">Pre-warn guests &amp;<br/>adjust itineraries</div>
+            <div class="flow-node node-purple" data-tip="Early warning triggers hotel and resort evacuation plans, ferry/boat recall, and coordination with civil authorities before tropical cyclone or storm surge arrival">Activate emergency<br/>response &amp;<br/>evacuation plans</div>
+            <div class="flow-node node-purple" data-tip="Seasonal climate outlooks enable dynamic pricing, promotional offers in shoulder season, and staffing optimisation to maximise revenue across the full weather-influenced calendar">Optimise seasonal<br/>pricing &amp; capacity</div>
+          </div>
+        </div>
+        <div class="flow-arrow">&#8594;</div>
+        <div class="flow-col">
+          <div class="flow-col-label">Value Outcomes</div>
+          <div class="flow-group">
+            <div class="flow-node node-green" data-tip="Fewer weather-disrupted visitor days, improved activity completion rates, and higher satisfaction scores drive repeat visits and positive reviews">&#8593; Visitor<br/>satisfaction &amp;<br/>repeat visits</div>
+            <div class="flow-node node-green" data-tip="Timely operator decisions minimise refund obligations and booking losses — weather-aware resorts recover a larger share of revenue during adverse periods">&#8595; Activity<br/>cancellation<br/>revenue loss</div>
+            <div class="flow-node node-green" data-tip="Proactive guest safety management and documented weather thresholds reduce liability exposure and support insurance claim resolution">&#8595; Incident &amp;<br/>liability costs</div>
+            <div class="flow-node node-green" data-tip="Weather intelligence shifts visitor demand toward optimal weather windows, increasing occupancy rates and average daily rates during peak periods">&#8593; Seasonal<br/>revenue<br/>optimisation</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Parameter Inputs — Tourism <span class="card-subtitle">National or regional tourism sector estimates</span></div>
+    <div class="inputs-grid">
+      <div class="input-group">
+        <label data-tip="Total annual international and domestic tourist arrivals to the destination being assessed">Annual tourist arrivals</label>
+        <input type="number" id="t_arrivals" value="500000" min="1" oninput="calcTourism()">
+        <span class="unit">visitors per year</span>
+      </div>
+      <div class="input-group">
+        <label data-tip="Mean daily visitor expenditure on accommodation, activities, food and transport">Average daily visitor spend</label>
+        <input type="number" id="t_spend" value="150" min="1" oninput="calcTourism()">
+        <span class="unit">USD per visitor per day</span>
+      </div>
+      <div class="input-group">
+        <label data-tip="Average number of days per visit lost to weather disruption: activity cancellations, confinement indoors, early departure">Weather-disrupted visitor days (baseline)</label>
+        <input type="number" id="t_disrupted_days" value="1.5" min="0" step="0.1" oninput="calcTourism()">
+        <span class="unit">days per visitor (baseline)</span>
+      </div>
+      <div class="input-group">
+        <label data-tip="Proportion of disrupted visitor days recoverable through weather-intelligent scheduling, activity substitution, and advance warning">Reduction in disrupted days from weather-intelligent operations</label>
+        <input type="number" id="t_disruption_reduction" value="40" min="0" max="100" oninput="calcTourism()">
+        <span class="unit">% reduction from improved planning</span>
+      </div>
+      <div class="input-group">
+        <label data-tip="Total annual revenue lost from activity cancellations, tour refunds, and event postponements attributable to adverse weather at baseline">Annual revenue lost to weather cancellations (baseline)</label>
+        <input type="number" id="t_cancellation_loss" value="5000000" min="0" oninput="calcTourism()">
+        <span class="unit">USD per year</span>
+      </div>
+      <div class="input-group">
+        <label data-tip="Share of cancellation revenue loss recoverable through advance rescheduling enabled by accurate short-range forecasts and condition alerts">Cancellation revenue recovery from advance forecasting</label>
+        <input type="number" id="t_cancellation_recovery" value="35" min="0" max="100" oninput="calcTourism()">
+        <span class="unit">% recovery from weather intelligence</span>
+      </div>
+      <div class="input-group">
+        <label data-tip="Annual number of weather-related visitor incidents: drownings, heat illness, storm injuries, ferry accidents — at baseline without systematic weather monitoring">Annual weather-related visitor incidents (baseline)</label>
+        <input type="number" id="t_incidents" value="30" min="0" oninput="calcTourism()">
+        <span class="unit">incidents per year</span>
+      </div>
+      <div class="input-group">
+        <label data-tip="Average cost per incident including search and rescue, medical evacuation, liability settlement, and reputational damage">Cost per incident</label>
+        <input type="number" id="t_incident_cost" value="80000" min="1" oninput="calcTourism()">
+        <span class="unit">USD (medical, SAR, liability)</span>
+      </div>
+      <div class="input-group">
+        <label data-tip="Incident reduction achievable through marine condition alerts, beach flag systems, activity go/no-go thresholds, and storm early warning protocols">Incident reduction from condition monitoring &amp; early warning</label>
+        <input type="number" id="t_incident_reduction" value="50" min="0" max="100" oninput="calcTourism()">
+        <span class="unit">% reduction from weather monitoring</span>
+      </div>
+      <div class="input-group">
+        <label data-tip="Combined annual insurance premiums for travel liability, activity risk, event cancellation, and property damage covering the tourism portfolio">Annual tourism insurance premiums (liability + cancellation)</label>
+        <input type="number" id="t_insurance" value="3000000" min="1" oninput="calcTourism()">
+        <span class="unit">USD per year</span>
+      </div>
+      <div class="input-group">
+        <label data-tip="Premium discount achievable through demonstrated weather-aware operations: documented thresholds, certified NMHS data use, and incident reduction track record">Insurance premium reduction from certified weather risk management</label>
+        <input type="number" id="t_insurance_reduction" value="12" min="0" max="100" oninput="calcTourism()">
+        <span class="unit">% reduction from verified risk management</span>
+      </div>
+    </div>
+    <hr class="divider">
+    <div class="card-title">Calculated Value — Tourism</div>
+    <div class="results-grid" id="tourism-results"></div>
+    <div class="assumptions" id="tourism-assumptions"></div>
+    <div class="btn-row"><button class="btn btn-export" onclick="exportSummary('tourism')">&#8595; Export Summary</button></div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- PAGE: COMPARE                                                -->
+<!-- ============================================================ -->
+<section id="page-compare" class="page">
+  <div class="card">
+    <div class="card-title">Sector Comparison — Annual Value of Weather Intelligence</div>
+    <div class="info-banner">
+      Values are drawn from your current parameter inputs on each sector tab. Adjust inputs in individual sector tabs to update this comparison.
+    </div>
+    <div class="compare-grid-5" id="compare-grid">
+      <!-- filled by JS -->
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Summary Insights</div>
+    <div id="compare-insights" class="about-section"></div>
+    <div class="btn-row">
+      <button class="btn btn-export" onclick="exportAllSectors()">⬇ Export Full Comparison Report</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- PAGE: ABOUT                                                  -->
+<!-- ============================================================ -->
+<section id="page-about" class="page">
+  <div class="card">
+    <div class="card-title">About This Tool</div>
+    <div class="about-section">
+      <p>This interactive model operationalises the <strong>prescriptive analytics framework</strong> described in Rogers (2026), applying Bayesian Decision Theory to quantify the economic and social value generated by weather intelligence across weather-sensitive sectors.</p>
+      <h3>Theoretical Basis</h3>
+      <p>Prescriptive models go beyond describing what happened (descriptive) or predicting what will happen (predictive) — they identify the <em>best course of action</em> under uncertainty. In weather-sensitive sectors, decision-makers choose actions that maximise expected profits or minimise expected costs, using meteorological information to reduce uncertainty (Frei et al. 2014; Wissuchek &amp; Zschech 2025).</p>
+      <p>The value of weather forecasts does not come from the data itself — it emerges from <strong>improved decisions</strong> by stakeholders who apply weather intelligence (WMO 2015d; Rogers et al. 2026). Benefit-cost analysis, while a necessary tool for justifying NMHS investment, is not a sufficient measure of this value — it is structurally bilateral, misses cross-sector cascade effects, and cannot capture social, intellectual, or natural capital. A quantitative systematic review of 175 peer-reviewed studies confirms that published benefit estimates are highly variable and concentrated in high-income countries, identifying a persistent gap between academic evidence and the calculations used in policy decisions (Farkas et al. 2025).</p>
+      <h3>Value Dimensions Modelled</h3>
+      <p>For each sector, the tool estimates value across four dimensions identified in Frei et al. (2014):</p>
+      <ul style="padding-left:18px; font-size:0.82rem; line-height:2; color:#37474f;">
+        <li>↑ <strong>Business profitability</strong> — increased economic value from optimal decision-making</li>
+        <li>↓ <strong>Government spending</strong> — reduced resource use in providing public services</li>
+        <li>↓ <strong>Damage avoidance</strong> — infrastructure, equipment, health, and life</li>
+        <li>↓ <strong>Productivity losses</strong> — minimising disruption to economic activity</li>
+      </ul>
+      <h3>Living Lab Context</h3>
+      <p>These models are starting points for a co-production approach within a <strong>Living Lab</strong> framework (ENOLL 2025; Lorenzo et al. 2021), involving citizens, academia, the private sector, and government in refining decision support tools. The Theory of Change connecting inputs to outcomes is described in Rogers (2026) Figure 7.</p>
+      <h3>How to Use This Tool</h3>
+      <p>Navigate to each sector tab and adjust the input parameters to match your national or regional context. The tool calculates estimated annual value from weather intelligence for each dimension. Use the Compare tab to see relative sector contributions. Export buttons generate plain-text summaries for reporting.</p>
+      <div class="tag-row">
+        <span class="tag">NMHSs</span><span class="tag">Prescriptive Analytics</span><span class="tag">Value Creation</span>
+        <span class="tag">Bayesian Decision Theory</span><span class="tag">Living Labs</span><span class="tag">WMO</span>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Key References</div>
+    <div class="ref-item">Rogers, D. (2026). <em>Maximizing Value Creation.</em> The Business of Weather. [Primary source for this tool]</div>
+    <div class="ref-item">Frei, T., von Grünigen, S. and Willemse, S. (2014). <em>Economic benefit of meteorology in the Swiss road transportation sector.</em> Meteorological Applications, 21: 294–300.</div>
+    <div class="ref-item">Von Grünigen, S., Willemse, S. and Frei, T. (2014). <em>Economic value of meteorological services to Switzerland's airlines: The case of TAF at Zurich airport.</em> Weather, Climate, and Society, 6: 264–272. https://doi.org/10.1175/WCAS-D-12-00042.1</div>
+    <div class="ref-item">Wissuchek, C. &amp; Zschech, P. (2025). <em>Prescriptive analytics: A framework review.</em> Decision Support Systems.</div>
+    <div class="ref-item">WMO (2015c). <em>WMO Guidelines on Multi-hazard Impact-based Forecast and Warning Services.</em> WMO-No. 1150. World Meteorological Organization.</div>
+    <div class="ref-item">WMO (2015d). <em>Valuing Weather and Climate: Economic Assessment of Meteorological and Hydrological Services.</em></div>
+    <div class="ref-item">Lindley, D.V. (1985). <em>Making Decisions.</em> Wiley. [Bayesian Decision Theory]</div>
+    <div class="ref-item">ENOLL (2025). <em>European Network of Living Labs: Defining characteristics.</em></div>
+    <div class="ref-item">Farkas, B., Linsenmeier, M., Talevi, M., Avner, P., Jafino, B.A. and Sidibe, M. (2025). <em>The Economic Value of Weather Forecasts: A Quantitative Systematic Literature Review.</em> Policy Research Working Paper 11213, World Bank Group.</div>
+    <div class="ref-item">Kahneman, D. (2011). <em>Thinking, Fast and Slow.</em> Farrar, Straus and Giroux. [System 1 / System 2 decision-making foundations]</div>
+  </div>
+</section>
+
+</main>
+
+<script>
+// ================================================================
+// NAVIGATION
+// ================================================================
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  event.currentTarget.classList.add('active');
+  if (id === 'compare') buildCompare();
+}
+
+// ================================================================
+// FORMAT HELPERS
+// ================================================================
+function fmt(n) {
+  if (n >= 1e9)  return '$' + (n/1e9).toFixed(2) + 'B';
+  if (n >= 1e6)  return '$' + (n/1e6).toFixed(2) + 'M';
+  if (n >= 1e3)  return '$' + (n/1e3).toFixed(1) + 'K';
+  return '$' + n.toFixed(0);
+}
+function pct(v) { return v + '%'; }
+function num(id) { return parseFloat(document.getElementById(id).value) || 0; }
+
+function buildResultCard(label, value, type, sub) {
+  return `<div class="result-card ${type}">
+    <div class="result-label">${label}</div>
+    <div class="result-value">${fmt(value)}</div>
+    <div class="result-sub">${sub || 'per year'}</div>
+  </div>`;
+}
+
+// Store totals for comparison
+const TOTALS = { fisheries: 0, disaster: 0, transport: 0, aqua: 0, health: 0, aviation: 0, energy: 0, banking: 0, construction: 0, tourism: 0, wrm: 0 };
+const DETAILS = { fisheries: {}, disaster: {}, transport: {}, aqua: {}, health: {}, aviation: {}, energy: {}, banking: {}, construction: {} };
+
+// ================================================================
+// FISHERIES CALCULATOR
+// ================================================================
+function calcFisheries() {
+  const vessels   = num('f_vessels');
+  const vval      = num('f_vessel_value');
+  const incidents = num('f_incidents');
+  const sarCost   = num('f_sar_cost');
+  const compliance= num('f_compliance') / 100;
+  const fdays     = num('f_fishing_days');
+  const catchVal  = num('f_catch_value');
+  const prodGain  = num('f_productivity') / 100;
+  const perish    = num('f_perishable');
+  const perishR   = num('f_perish_reduce') / 100;
+
+  // SAR cost avoidance
+  const avoidedIncidents = incidents * compliance;
+  const sarSaved = avoidedIncidents * sarCost;
+
+  // Vessel loss avoidance (assume 2% of incidents result in vessel loss)
+  const vesselLossSaved = avoidedIncidents * 0.02 * vval;
+
+  // Productivity gain from targeting favourable windows
+  const productivityGain = vessels * fdays * catchVal * prodGain;
+
+  // Perishable loss reduction
+  const perishSaved = perish * perishR;
+
+  // Government spending reduction (assume SAR is 60% govt funded)
+  const govtSaved = sarSaved * 0.6;
+
+  const total = sarSaved + vesselLossSaved + productivityGain + perishSaved;
+
+  TOTALS.fisheries = total;
+  DETAILS.fisheries = { sarSaved, vesselLossSaved, productivityGain, perishSaved, govtSaved };
+
+  document.getElementById('fisheries-results').innerHTML = [
+    buildResultCard('SAR Cost Avoidance', sarSaved, '', `${avoidedIncidents.toFixed(0)} incidents avoided × ${fmt(sarCost)} each`),
+    buildResultCard('Vessel Loss Prevention', vesselLossSaved, 'positive', 'Avoided total loss events at sea'),
+    buildResultCard('Fishing Productivity Gain', productivityGain, 'positive', `${pct(num('f_productivity'))} improvement in daily catch value`),
+    buildResultCard('Perishable Loss Reduction', perishSaved, 'positive', `${pct(num('f_perish_reduce'))} of annual losses avoided`),
+    buildResultCard('Govt Spending Reduction', govtSaved, '', 'Reduced SAR &amp; emergency funding'),
+    buildResultCard('TOTAL ANNUAL VALUE', total, 'total', 'Sum of all value dimensions'),
+  ].join('');
+
+  document.getElementById('fisheries-assumptions').innerHTML =
+    `<strong>Model assumptions:</strong> ${pct(num('f_compliance'))} compliance rate applied to baseline incidents.
+    2% of incidents result in total vessel loss. Productivity gain applied to ${vessels.toLocaleString()} vessels × ${fdays} days × ${fmt(catchVal)}/day.
+    SAR government share: 60%. This is an illustrative estimate — validate against local data.`;
+}
+
+// ================================================================
+// DISASTER MANAGEMENT CALCULATOR
+// ================================================================
+function calcDisaster() {
+  const events      = num('d_incidents');
+  const damage      = num('d_damage');
+  const damR        = num('d_damage_reduce') / 100;
+  const respCost    = num('d_response_cost');
+  const respR       = num('d_response_reduce') / 100;
+  const prodLoss    = num('d_productivity');
+  const prodR       = num('d_prod_reduce') / 100;
+
+  const damageSaved   = events * damage * damR;
+  const responseSaved = events * respCost * respR;
+  const prodSaved     = events * prodLoss * prodR;
+  const total         = damageSaved + responseSaved + prodSaved;
+
+  TOTALS.disaster = total;
+  DETAILS.disaster = { damageSaved, responseSaved, prodSaved };
+
+  document.getElementById('disaster-results').innerHTML = [
+    buildResultCard('Property Damage Avoided', damageSaved, 'warning', `${events} events × ${fmt(damage)} × ${pct(num('d_damage_reduce'))} reduction`),
+    buildResultCard('Emergency Response Savings', responseSaved, '', `Proactive vs. reactive cost difference`),
+    buildResultCard('Productivity Loss Prevented', prodSaved, 'positive', `Business disruption minimised`),
+    buildResultCard('TOTAL ANNUAL VALUE', total, 'total', 'Sum of all value dimensions'),
+  ].join('');
+
+  document.getElementById('disaster-assumptions').innerHTML =
+    `<strong>Model assumptions:</strong> ${events} significant weather events/year (baseline).
+    Damage and response costs are per-event averages. Reductions assume timely warnings reach
+    decision-makers with sufficient lead time to take protective action. Validate reduction rates
+    with local historical data on warning lead times and compliance.`;
+}
+
+// ================================================================
+// ROAD TRANSPORT CALCULATOR
+// ================================================================
+function calcTransport() {
+  const freightKm  = num('t_freight_km');
+  const wthrFrac   = num('t_weather_frac') / 100;
+  const delayCost  = num('t_delay_cost');
+  const delayR     = num('t_delay_reduce') / 100;
+  const maintBudget= num('t_maint_budget');
+  const maintR     = num('t_maint_reduce') / 100;
+  const accidents  = num('t_accidents');
+  const accCost    = num('t_accident_cost');
+  const accR       = num('t_acc_reduce') / 100;
+  const travelTime = num('t_travel_time');
+  const vot        = num('t_vot');
+  const timeR      = num('t_time_reduce') / 100;
+
+  const delaySaved   = freightKm * wthrFrac * delayCost * delayR;
+  const maintSaved   = maintBudget * maintR;
+  const accSaved     = accidents * accCost * accR;
+  const timeSaved    = travelTime * vot * timeR;
+  const total        = delaySaved + maintSaved + accSaved + timeSaved;
+
+  TOTALS.transport = total;
+  DETAILS.transport = { delaySaved, maintSaved, accSaved, timeSaved };
+
+  document.getElementById('transport-results').innerHTML = [
+    buildResultCard('Freight Delay Cost Savings', delaySaved, 'positive', `${(freightKm * wthrFrac / 1e6).toFixed(0)}M weather-sensitive km × ${pct(num('t_delay_reduce'))} reduction`),
+    buildResultCard('Road Maintenance Savings', maintSaved, '', `Proactive treatment vs. reactive repair`),
+    buildResultCard('Accident Cost Avoidance', accSaved, 'warning', `${(accidents * accR).toFixed(0)} accidents avoided`),
+    buildResultCard('Individual Travel Time Value', timeSaved, 'positive', `${(travelTime * timeR / 1e6).toFixed(1)}M person-hours saved × ${fmt(vot)}/hr`),
+    buildResultCard('TOTAL ANNUAL VALUE', total, 'total', 'Sum of all value dimensions (Frei et al. methodology)'),
+  ].join('');
+
+  document.getElementById('transport-assumptions').innerHTML =
+    `<strong>Methodology (Frei et al. 2014):</strong> Economic benefit modelled across four dimensions:
+    company profitability (delay savings), government spending (maintenance), damage avoidance (accidents),
+    and individual benefits (travel time). Weather-sensitive fraction and reduction rates should be validated
+    through stakeholder interviews in your national context.`;
+}
+
+// ================================================================
+// AQUACULTURE & FARMING CALCULATOR
+// ================================================================
+function calcAqua() {
+  const farmers      = num('a_farmers');
+  const income       = num('a_income');
+  const prodGain     = num('a_prod_gain') / 100;
+  const cropLoss     = num('a_crop_loss');
+  const cropReduce   = num('a_crop_reduce') / 100;
+  const diseaseCost  = num('a_disease_cost');
+  const diseaseR     = num('a_disease_reduce') / 100;
+  const perishable   = num('a_perishable');
+  const perishR      = num('a_perish_reduce') / 100;
+  const extension    = num('a_extension');
+  const extR         = num('a_ext_reduce') / 100;
+
+  const productivityGain = farmers * income * prodGain;
+  const cropSaved        = cropLoss * cropReduce;
+  const diseaseSaved     = diseaseCost * diseaseR;
+  const perishSaved      = perishable * perishR;
+  const extensionSaved   = extension * extR;
+  const total            = productivityGain + cropSaved + diseaseSaved + perishSaved + extensionSaved;
+
+  TOTALS.aqua = total;
+  DETAILS.aqua = { productivityGain, cropSaved, diseaseSaved, perishSaved, extensionSaved };
+
+  document.getElementById('aqua-results').innerHTML = [
+    buildResultCard('Farming Productivity Gain', productivityGain, 'positive', `${farmers.toLocaleString()} households × ${fmt(income)} × ${pct(num('a_prod_gain'))} improvement`),
+    buildResultCard('Crop Loss Avoidance', cropSaved, '', `${pct(num('a_crop_reduce'))} of baseline ${fmt(cropLoss)} losses prevented`),
+    buildResultCard('Disease Outbreak Cost Savings', diseaseSaved, 'positive', `Forecast-led vector control &amp; early interventions`),
+    buildResultCard('Perishable Transit Loss Reduction', perishSaved, '', `${pct(num('a_perish_reduce'))} of transit losses avoided`),
+    buildResultCard('Extension Service Efficiency', extensionSaved, '', `Targeted intelligence reduces redundant advisory costs`),
+    buildResultCard('TOTAL ANNUAL VALUE', total, 'total', 'Sum of all value dimensions'),
+  ].join('');
+
+  document.getElementById('aqua-assumptions').innerHTML =
+    `<strong>Model assumptions:</strong> Productivity gain applied across ${farmers.toLocaleString()} farm households at average income of ${fmt(income)}.
+    Seasonal and short-range forecasts jointly reduce crop losses and disease incidence. Supply chain perishable savings
+    share methodology with road transport sector. Extension efficiency gains reflect targeted, intelligence-led advisory
+    replacing blanket services. Validate reduction rates with national agricultural ministry data.`;
+}
+
+// ================================================================
+// HUMAN HEALTH CALCULATOR
+// ================================================================
+function calcHealth() {
+  const hospTemp    = num('h_hosp_temp');
+  const hospCost    = num('h_hosp_cost');
+  const hospReduce  = num('h_hosp_reduce') / 100;
+  const diseaseCases= num('h_disease_cases');
+  const diseaseCost = num('h_disease_cost');
+  const diseaseR    = num('h_disease_reduce') / 100;
+  const deaths      = num('h_deaths');
+  const vsl         = num('h_vsl');
+  const deathR      = num('h_death_reduce') / 100;
+  const workdays    = num('h_workdays');
+  const gdpDay      = num('h_gdp_day');
+  const workR       = num('h_work_reduce') / 100;
+
+  const hospSaved     = hospTemp * hospCost * hospReduce;
+  const diseaseSaved  = diseaseCases * diseaseCost * diseaseR;
+  const mortalitySaved= deaths * vsl * deathR;
+  const workSaved     = workdays * gdpDay * workR;
+  const total         = hospSaved + diseaseSaved + mortalitySaved + workSaved;
+
+  TOTALS.health = total;
+  DETAILS.health = { hospSaved, diseaseSaved, mortalitySaved, workSaved };
+
+  document.getElementById('health-results').innerHTML = [
+    buildResultCard('Hospitalisation Cost Avoidance', hospSaved, '', `${(hospTemp * hospReduce).toFixed(0)} admissions avoided × ${fmt(hospCost)}`),
+    buildResultCard('Infectious Disease Cost Savings', diseaseSaved, 'positive', `${(diseaseCases * diseaseR).toFixed(0)} fewer cases × ${fmt(diseaseCost)}/case`),
+    buildResultCard('Mortality Reduction Value (VSL)', mortalitySaved, 'warning', `${(deaths * deathR).toFixed(0)} premature deaths avoided × VSL ${fmt(vsl)}`),
+    buildResultCard('Workforce Productivity Recovered', workSaved, 'positive', `${((workdays * workR)/1e6).toFixed(1)}M person-days × ${fmt(gdpDay)}/day`),
+    buildResultCard('TOTAL ANNUAL VALUE', total, 'total', 'Sum of all value dimensions'),
+  ].join('');
+
+  document.getElementById('health-assumptions').innerHTML =
+    `<strong>Model assumptions:</strong> Value of Statistical Life (VSL) is a standard welfare economics measure — it does not imply
+    a literal price on life but reflects societal willingness-to-pay for marginal risk reduction.
+    Infectious disease reductions assume forecast-led timing of vector control interventions (e.g. spraying, nets) based on
+    rainfall and temperature outlooks. Validate VSL and hospitalisation figures against national health economics data.
+    Note: this model likely <em>underestimates</em> total health value as it excludes mental health impacts and long-term climate exposure effects.`;
+}
+
+// ================================================================
+// AVIATION CALCULATOR
+// ================================================================
+function calcAviation() {
+  const landings     = num('av_landings');
+  const fuelSaving   = num('av_fuel_saving');
+  const tafFrac      = num('av_taf_frac') / 100;
+  const diversions   = num('av_diversions');
+  const divCost      = num('av_div_cost');
+  const divReduce    = num('av_div_reduce') / 100;
+  const delayHours   = num('av_delay_hours');
+  const vot          = num('av_vot');
+  const delayReduce  = num('av_delay_reduce') / 100;
+  const deiceCost    = num('av_deice_cost');
+  const deiceReduce  = num('av_deice_reduce') / 100;
+
+  const fuelSaved    = landings * tafFrac * fuelSaving;
+  const divSaved     = diversions * divCost * divReduce;
+  const delaySaved   = delayHours * vot * delayReduce;
+  const deiceSaved   = deiceCost * deiceReduce;
+  const total        = fuelSaved + divSaved + delaySaved + deiceSaved;
+
+  TOTALS.aviation = total;
+  DETAILS.aviation = { fuelSaved, divSaved, delaySaved, deiceSaved };
+
+  document.getElementById('aviation-results').innerHTML = [
+    buildResultCard('TAF Fuel Cost Savings', fuelSaved, 'positive', `${(landings*tafFrac).toFixed(0)} flights × ${fmt(fuelSaving)}/flight (Von Grünigen methodology)`),
+    buildResultCard('Diversion Cost Avoidance', divSaved, '', `${(diversions*divReduce).toFixed(0)} diversions avoided × ${fmt(divCost)} avg cost`),
+    buildResultCard('Passenger Delay Value', delaySaved, 'positive', `${((delayHours*delayReduce)/1e6).toFixed(1)}M passenger-hours saved × ${fmt(vot)}/hr`),
+    buildResultCard('De-icing &amp; Ground Savings', deiceSaved, '', `Proactive scheduling vs. reactive response`),
+    buildResultCard('TOTAL ANNUAL VALUE', total, 'total', 'Sum of all value dimensions'),
+  ].join('');
+
+  document.getElementById('aviation-assumptions').innerHTML =
+    `<strong>Methodology (Von Grünigen et al. 2014):</strong> Fuel saving calculated for flights where TAF materially influences fuel loading decision — approximately ${pct(num('av_taf_frac'))} of IFR operations. Reference condition: flight planned using climatological probability of destination IMC only (no TAF). Diversion and delay reductions require validation through airline operational data interviews. Default fuel saving of ${fmt(fuelSaving)}/flight is within Von Grünigen's reported range of $109–$164 for Zurich Airport operations.`;
+}
+
+// ================================================================
+// ENERGY CALCULATOR
+// ================================================================
+function calcEnergy() {
+  const generation   = num('en_generation');
+  const price        = num('en_price');
+  const curtail      = num('en_curtail') / 100;
+  const curtailR     = num('en_curtail_reduce') / 100;
+  const balancing    = num('en_balancing');
+  const balR         = num('en_bal_reduce') / 100;
+  const outage       = num('en_outage');
+  const outR         = num('en_out_reduce') / 100;
+  const hydro        = num('en_hydro');
+  const hydroGain    = num('en_hydro_gain') / 100;
+
+  const curtailSaved = generation * curtail * curtailR * price;
+  const balSaved     = balancing * balR;
+  const outageSaved  = outage * outR;
+  const hydroSaved   = hydro * price * hydroGain;
+  const total        = curtailSaved + balSaved + outageSaved + hydroSaved;
+
+  TOTALS.energy = total;
+  DETAILS.energy = { curtailSaved, balSaved, outageSaved, hydroSaved };
+
+  document.getElementById('energy-results').innerHTML = [
+    buildResultCard('Curtailment Reduction Value', curtailSaved, 'positive', `${(generation*curtail*curtailR/1e3).toFixed(0)}K MWh recovered × ${fmt(price)}/MWh`),
+    buildResultCard('Balancing Cost Savings', balSaved, '', `${pct(num('en_bal_reduce'))} of ${fmt(balancing)} baseline reduced by better forecasts`),
+    buildResultCard('Outage Cost Avoidance', outageSaved, 'warning', `Infrastructure protection &amp; proactive crew deployment`),
+    buildResultCard('Hydro Reservoir Optimisation', hydroSaved, 'positive', `${pct(num('en_hydro_gain'))} gain on ${(hydro/1e6).toFixed(1)}M MWh hydro generation`),
+    buildResultCard('TOTAL ANNUAL VALUE', total, 'total', 'Sum of all value dimensions'),
+  ].join('');
+
+  document.getElementById('energy-assumptions').innerHTML =
+    `<strong>Model assumptions:</strong> Curtailment reduction assumes improved wind/solar forecasts enable TSOs to absorb more variable generation without requiring dispatch of backup capacity. Balancing cost reduction reflects more accurate generation forecasts reducing the volume of expensive reserve products procured. Hydro optimisation value assumes seasonal inflow forecasts allow reservoir managers to maximise generation revenue by better timing drawdown decisions. Validate all reduction rates against national grid operator data.`;
+}
+
+// ================================================================
+// BANKING CALCULATOR
+// ================================================================
+function calcBanking() {
+  const portfolio = num('b_portfolio');
+  const nplRate = num('b_npl_rate') / 100;
+  const nplReduction = num('b_npl_reduction') / 100;
+  const provisionCost = num('b_provision_cost');
+  const provisionReduction = num('b_provision_reduction') / 100;
+  const newLoans = num('b_new_loans');
+  const inclusionReturn = num('b_inclusion_return') / 100;
+  const complianceCost = num('b_compliance_cost');
+  const complianceReduction = num('b_compliance_reduction') / 100;
+
+  const nplSaving = portfolio * nplRate * nplReduction;
+  const provisionSaving = provisionCost * provisionReduction;
+  const inclusionRevenue = newLoans * inclusionReturn;
+  const complianceSaving = complianceCost * complianceReduction;
+  const total = nplSaving + provisionSaving + inclusionRevenue + complianceSaving;
+
+  TOTALS.banking = total;
+  DETAILS.banking = { nplSaving, provisionSaving, inclusionRevenue, complianceSaving };
+
+  document.getElementById('banking-results').innerHTML = [
+    buildResultCard('NPL Rate Reduction', nplSaving, 'positive', `${pct(num('b_npl_reduction'))} reduction on ${pct(num('b_npl_rate'))} NPL rate × ${fmt(portfolio)} portfolio`),
+    buildResultCard('Provisioning Cost Saving', provisionSaving, 'positive', `${pct(num('b_provision_reduction'))} reduction on ${fmt(provisionCost)} annual provisioning`),
+    buildResultCard('Financial Inclusion Revenue', inclusionRevenue, 'positive', `${pct(num('b_inclusion_return'))} return on ${fmt(newLoans)} newly-enabled loans`),
+    buildResultCard('Regulatory Compliance Saving', complianceSaving, '', `${pct(num('b_compliance_reduction'))} efficiency gain on ${fmt(complianceCost)} compliance costs`),
+    buildResultCard('Total Annual Value', total, 'total', 'Sum of NPL reduction + provisioning + inclusion + compliance savings'),
+  ].join('');
+  document.getElementById('banking-assumptions').innerHTML = `<strong>Model assumptions:</strong>
+    NPL saving = portfolio × baseline NPL rate × reduction factor attributable to weather-intelligent credit assessment.
+    Provisioning saving = cost reduction from early warning enabling proactive portfolio management before adverse climate seasons.
+    Inclusion revenue = new loan portfolio enabled by weather-indexed products × net interest margin.
+    Compliance saving = reduced cost of regulatory climate stress testing and TCFD/CSRD reporting with standardised NMHS data.
+    Multiplier effects across financed sectors not captured in these direct figures.`;
+}
+
+// ================================================================
+// CONSTRUCTION CALCULATOR
+// ================================================================
+function calcConstruction() {
+  const projects = num('c_projects');
+  const projValue = num('c_project_value');
+  const totalValue = projects * projValue;
+  const delayPct = num('c_delay_pct') / 100;
+  const delayRed = num('c_delay_reduction') / 100;
+  const reworkPct = num('c_rework_pct') / 100;
+  const reworkRed = num('c_rework_reduction') / 100;
+  const incidentCost = num('c_incidents');
+  const incidentCount = num('c_incident_count');
+  const incidentRed = num('c_incident_reduction') / 100;
+  const insurance = num('c_insurance');
+  const insuranceRed = num('c_insurance_reduction') / 100;
+
+  const delaySaving = totalValue * delayPct * delayRed;
+  const reworkSaving = totalValue * reworkPct * reworkRed;
+  const safetySaving = incidentCost * incidentCount * incidentRed;
+  const insuranceSaving = insurance * insuranceRed;
+  const total = delaySaving + reworkSaving + safetySaving + insuranceSaving;
+
+  TOTALS.construction = total;
+  DETAILS.construction = { delaySaving, reworkSaving, safetySaving, insuranceSaving };
+
+  document.getElementById('construction-results').innerHTML = [
+    buildResultCard('Weather Delay Avoidance', delaySaving, 'positive', `${pct(num('c_delay_reduction'))} of ${pct(num('c_delay_pct'))} baseline delay costs across ${projects} projects`),
+    buildResultCard('Rework Cost Avoidance', reworkSaving, 'positive', `${pct(num('c_rework_reduction'))} reduction on ${pct(num('c_rework_pct'))} rework rate`),
+    buildResultCard('Worker Safety Saving', safetySaving, 'positive', `${pct(num('c_incident_reduction'))} reduction × ${incidentCount} incidents × ${fmt(incidentCost)} avg cost`),
+    buildResultCard('Insurance Premium Saving', insuranceSaving, '', `${pct(num('c_insurance_reduction'))} reduction on ${fmt(insurance)} annual premium`),
+    buildResultCard('Total Annual Value', total, 'total', 'Sum across all four construction value dimensions'),
+  ].join('');
+  document.getElementById('construction-assumptions').innerHTML = `<strong>Model assumptions:</strong>
+    Total portfolio = ${projects.toLocaleString()} projects × ${fmt(projValue)} avg value = ${fmt(totalValue)}.
+    Delay saving = total portfolio × baseline weather delay % × reduction achievable through weather-intelligent scheduling.
+    Rework saving = total portfolio × rework rate × reduction from threshold-calibrated concrete, asphalt and crane operations.
+    Safety saving = avoided incidents × average incident cost (medical, lost time, liability).
+    Insurance saving = Builder's All Risk premium reduction from verified weather risk management programme.`;
+}
+
+function calcTourism() {
+  const arrivals = num('t_arrivals');
+  const spend = num('t_spend');
+  const disruptedDays = num('t_disrupted_days');
+  const disruptionRed = num('t_disruption_reduction') / 100;
+  const cancellationLoss = num('t_cancellation_loss');
+  const cancellationRec = num('t_cancellation_recovery') / 100;
+  const incidents = num('t_incidents');
+  const incidentCost = num('t_incident_cost');
+  const incidentRed = num('t_incident_reduction') / 100;
+  const insurance = num('t_insurance');
+  const insuranceRed = num('t_insurance_reduction') / 100;
+
+  const disruption_saving = arrivals * spend * disruptedDays * disruptionRed;
+  const cancellation_saving = cancellationLoss * cancellationRec;
+  const safety_saving = incidents * incidentCost * incidentRed;
+  const insurance_saving = insurance * insuranceRed;
+  const total = disruption_saving + cancellation_saving + safety_saving + insurance_saving;
+
+  TOTALS.tourism = total;
+  DETAILS.tourism = { disruption_saving, cancellation_saving, safety_saving, insurance_saving };
+
+  document.getElementById('tourism-results').innerHTML = [
+    buildResultCard('Visitor Disruption Recovery', disruption_saving, 'positive', pct(num('t_disruption_reduction')) + ' of ' + disruptedDays.toFixed(1) + ' disrupted days/visitor recovered × ' + arrivals.toLocaleString() + ' arrivals × ' + fmt(spend) + '/day'),
+    buildResultCard('Cancellation Revenue Recovery', cancellation_saving, 'positive', pct(num('t_cancellation_recovery')) + ' recovery on ' + fmt(cancellationLoss) + ' baseline cancellation losses'),
+    buildResultCard('Visitor Safety Saving', safety_saving, 'positive', pct(num('t_incident_reduction')) + ' reduction × ' + incidents + ' incidents × ' + fmt(incidentCost) + ' avg cost'),
+    buildResultCard('Insurance Premium Saving', insurance_saving, '', pct(num('t_insurance_reduction')) + ' reduction on ' + fmt(insurance) + ' annual premiums'),
+    buildResultCard('Total Annual Value', total, 'total', 'Sum across all four tourism value dimensions'),
+  ].join('');
+  document.getElementById('tourism-assumptions').innerHTML = '<strong>Model assumptions:</strong> '
+    + 'Disruption saving = ' + arrivals.toLocaleString() + ' arrivals × ' + fmt(spend) + '/day × ' + disruptedDays.toFixed(1) + ' disrupted days × ' + pct(num('t_disruption_reduction')) + ' recovery rate. '
+    + 'Cancellation saving = baseline cancellation losses × proportion recovered through advance rescheduling. '
+    + 'Safety saving = avoided incidents × average incident cost (SAR, medical, liability, reputational). '
+    + 'Insurance saving = combined liability and cancellation premium reduction from certified weather risk management. '
+    + 'This model is particularly applicable to SIDS economies where tourism represents a large share of GDP.';
+}
+
+function calcWRM() {
+  const hydroMW = num('w_hydro_mw');
+  const tariff = num('w_tariff');
+  const hydroGain = num('w_hydro_gain') / 100;
+  const irrigHa = num('w_irrigated_ha');
+  const irrCostHa = num('w_irr_cost_ha');
+  const irrSaving = num('w_irr_saving') / 100;
+  const emergencyCost = num('w_emergency_cost');
+  const emergencyRed = num('w_emergency_reduction') / 100;
+  const floodDamage = num('w_flood_damage');
+  const floodRed = num('w_flood_reduction') / 100;
+
+  const annualMWh = hydroMW * 8760 * 0.40;
+  const hydro_saving = annualMWh * tariff * hydroGain;
+  const irrig_saving = irrigHa * irrCostHa * irrSaving;
+  const drought_saving = emergencyCost * emergencyRed;
+  const flood_saving = floodDamage * floodRed;
+  const total = hydro_saving + irrig_saving + drought_saving + flood_saving;
+
+  TOTALS.wrm = total;
+  DETAILS.wrm = { hydro_saving, irrig_saving, drought_saving, flood_saving };
+
+  document.getElementById('wrm-results').innerHTML = [
+    buildResultCard('Hydropower Revenue Uplift', hydro_saving, 'positive', pct(num('w_hydro_gain')) + ' value gain on ' + hydroMW.toLocaleString() + ' MW x 40% CF x 8,760 hrs x ' + fmt(tariff) + '/MWh'),
+    buildResultCard('Irrigation Water Saving', irrig_saving, 'positive', pct(num('w_irr_saving')) + ' reduction on ' + irrigHa.toLocaleString() + ' ha x ' + fmt(irrCostHa) + '/ha irrigation cost'),
+    buildResultCard('Drought Emergency Avoidance', drought_saving, 'positive', pct(num('w_emergency_reduction')) + ' reduction on ' + fmt(emergencyCost) + ' baseline emergency water spending'),
+    buildResultCard('Flood Damage Avoidance', flood_saving, 'positive', pct(num('w_flood_reduction')) + ' of ' + fmt(floodDamage) + ' baseline flood damage via reservoir management and warning'),
+    buildResultCard('Total Annual Value', total, 'total', 'Sum across all four water resource management value dimensions'),
+  ].join('');
+  document.getElementById('wrm-assumptions').innerHTML = '<strong>Model assumptions:</strong> '
+    + 'Hydro uplift = capacity x 40% CF x 8,760 hours x tariff x % gain from forecast-optimised scheduling. '
+    + 'Irrigation saving = irrigated area x cost per ha x over-irrigation reduction from ET scheduling. '
+    + 'Drought saving = baseline emergency spending x reduction from proactive seasonal drought management. '
+    + 'Flood saving = baseline annual damage x % avoidable through pre-release and NMHS flood guidance. '
+    + 'Particularly applicable in countries where hydropower provides >30% of national electricity generation.';
+}
+
+// ================================================================
+// COMPARE PAGE
+// ================================================================
+function buildCompare() {
+  calcFisheries(); calcDisaster(); calcTransport(); calcAqua(); calcHealth(); calcAviation(); calcEnergy(); calcBanking(); calcConstruction(); calcTourism(); calcWRM();
+
+  const max = Math.max(TOTALS.fisheries, TOTALS.disaster, TOTALS.transport, TOTALS.aqua, TOTALS.health, TOTALS.aviation, TOTALS.energy, TOTALS.banking, TOTALS.construction, TOTALS.tourism||0, TOTALS.wrm||0, 1);
+
+  document.getElementById('compare-grid').innerHTML = `
+    <div class="compare-sector-card fisheries">
+      <div class="compare-sector-name">🐟 Fisheries</div>
+      ${compareRow('SAR &amp; Vessel Protection', (DETAILS.fisheries.sarSaved||0) + (DETAILS.fisheries.vesselLossSaved||0))}
+      ${compareRow('Fishing Productivity', DETAILS.fisheries.productivityGain||0)}
+      ${compareRow('Perishable Loss Reduction', DETAILS.fisheries.perishSaved||0)}
+      ${compareRow('Govt Spending Reduction', DETAILS.fisheries.govtSaved||0)}
+      <div class="compare-total">Total: ${fmt(TOTALS.fisheries)}</div>
+      <div class="bar-container">
+        <div class="text-muted" style="font-size:0.65rem;margin-bottom:2px;">Relative to largest sector</div>
+        <div class="bar-track"><div class="bar-fill bar-fisheries" style="width:${(TOTALS.fisheries/max*100).toFixed(1)}%"></div></div>
+      </div>
+    </div>
+    <div class="compare-sector-card disaster">
+      <div class="compare-sector-name">🌪️ Disaster Management</div>
+      ${compareRow('Property Damage Avoided', DETAILS.disaster.damageSaved||0)}
+      ${compareRow('Emergency Response Savings', DETAILS.disaster.responseSaved||0)}
+      ${compareRow('Productivity Loss Prevented', DETAILS.disaster.prodSaved||0)}
+      <div class="compare-total">Total: ${fmt(TOTALS.disaster)}</div>
+      <div class="bar-container">
+        <div class="text-muted" style="font-size:0.65rem;margin-bottom:2px;">Relative to largest sector</div>
+        <div class="bar-track"><div class="bar-fill bar-disaster" style="width:${(TOTALS.disaster/max*100).toFixed(1)}%"></div></div>
+      </div>
+    </div>
+    <div class="compare-sector-card transport">
+      <div class="compare-sector-name">🚛 Road Transport</div>
+      ${compareRow('Freight Delay Savings', DETAILS.transport.delaySaved||0)}
+      ${compareRow('Road Maintenance Savings', DETAILS.transport.maintSaved||0)}
+      ${compareRow('Accident Cost Avoidance', DETAILS.transport.accSaved||0)}
+      ${compareRow('Travel Time Value', DETAILS.transport.timeSaved||0)}
+      <div class="compare-total">Total: ${fmt(TOTALS.transport)}</div>
+      <div class="bar-container">
+        <div class="text-muted" style="font-size:0.65rem;margin-bottom:2px;">Relative to largest sector</div>
+        <div class="bar-track"><div class="bar-fill bar-transport" style="width:${(TOTALS.transport/max*100).toFixed(1)}%"></div></div>
+      </div>
+    </div>
+    <div class="compare-sector-card aqua">
+      <div class="compare-sector-name">🌾 Farming</div>
+      ${compareRow('Farming Productivity Gain', DETAILS.aqua.productivityGain||0)}
+      ${compareRow('Crop &amp; Aquaculture Loss Avoidance', DETAILS.aqua.cropSaved||0)}
+      ${compareRow('Disease Outbreak Savings', DETAILS.aqua.diseaseSaved||0)}
+      ${compareRow('Perishable &amp; Extension Savings', (DETAILS.aqua.perishSaved||0) + (DETAILS.aqua.extensionSaved||0))}
+      <div class="compare-total">Total: ${fmt(TOTALS.aqua)}</div>
+      <div class="bar-container">
+        <div class="text-muted" style="font-size:0.65rem;margin-bottom:2px;">Relative to largest sector</div>
+        <div class="bar-track"><div class="bar-fill bar-aqua" style="width:${(TOTALS.aqua/max*100).toFixed(1)}%"></div></div>
+      </div>
+    </div>
+    <div class="compare-sector-card health">
+      <div class="compare-sector-name">🏥 Human Health</div>
+      ${compareRow('Hospitalisation Cost Avoidance', DETAILS.health.hospSaved||0)}
+      ${compareRow('Infectious Disease Savings', DETAILS.health.diseaseSaved||0)}
+      ${compareRow('Mortality Reduction (VSL)', DETAILS.health.mortalitySaved||0)}
+      ${compareRow('Workforce Productivity', DETAILS.health.workSaved||0)}
+      <div class="compare-total">Total: ${fmt(TOTALS.health)}</div>
+      <div class="bar-container">
+        <div class="text-muted" style="font-size:0.65rem;margin-bottom:2px;">Relative to largest sector</div>
+        <div class="bar-track"><div class="bar-fill bar-health" style="width:${(TOTALS.health/max*100).toFixed(1)}%"></div></div>
+      </div>
+    </div>
+    <div class="compare-sector-card aviation">
+      <div class="compare-sector-name">✈️ Aviation</div>
+      ${compareRow('TAF Fuel Cost Savings', DETAILS.aviation.fuelSaved||0)}
+      ${compareRow('Diversion Cost Avoidance', DETAILS.aviation.divSaved||0)}
+      ${compareRow('Passenger Delay Value', DETAILS.aviation.delaySaved||0)}
+      ${compareRow('De-icing &amp; Ground Savings', DETAILS.aviation.deiceSaved||0)}
+      <div class="compare-total">Total: ${fmt(TOTALS.aviation)}</div>
+      <div class="bar-container">
+        <div class="text-muted" style="font-size:0.65rem;margin-bottom:2px;">Relative to largest sector</div>
+        <div class="bar-track"><div class="bar-fill bar-aviation" style="width:${(TOTALS.aviation/max*100).toFixed(1)}%"></div></div>
+      </div>
+    </div>
+    <div class="compare-sector-card energy">
+      <div class="compare-sector-name">⚡ Energy</div>
+      ${compareRow('Curtailment Reduction Value', DETAILS.energy.curtailSaved||0)}
+      ${compareRow('Balancing Cost Savings', DETAILS.energy.balSaved||0)}
+      ${compareRow('Outage Cost Avoidance', DETAILS.energy.outageSaved||0)}
+      ${compareRow('Hydro Reservoir Optimisation', DETAILS.energy.hydroSaved||0)}
+      <div class="compare-total">Total: ${fmt(TOTALS.energy)}</div>
+      <div class="bar-container">
+        <div class="text-muted" style="font-size:0.65rem;margin-bottom:2px;">Relative to largest sector</div>
+        <div class="bar-track"><div class="bar-fill bar-energy" style="width:${(TOTALS.energy/max*100).toFixed(1)}%"></div></div>
+      </div>
+    </div>
+    <div class="compare-sector-card banking">
+      <div class="compare-sector-name">🏦 Banking</div>
+      ${compareRow('NPL Rate Reduction', DETAILS.banking.nplSaving||0)}
+      ${compareRow('Provisioning Cost Saving', DETAILS.banking.provisionSaving||0)}
+      ${compareRow('Financial Inclusion Revenue', DETAILS.banking.inclusionRevenue||0)}
+      <div class="compare-total">Total: ${fmt(TOTALS.banking)}</div>
+      <div class="bar-container">
+        <div class="text-muted" style="font-size:0.65rem;margin-bottom:2px;">Relative to largest sector</div>
+        <div class="bar-track"><div class="bar-fill bar-banking" style="width:${(TOTALS.banking/max*100).toFixed(1)}%"></div></div>
+      </div>
+    </div>
+    <div class="compare-sector-card construction">
+      <div class="compare-sector-name">🏗️ Construction</div>
+      ${compareRow('Weather Delay Avoidance', DETAILS.construction.delaySaving||0)}
+      ${compareRow('Rework Cost Avoidance', DETAILS.construction.reworkSaving||0)}
+      ${compareRow('Worker Safety Saving', DETAILS.construction.safetySaving||0)}
+      ${compareRow('Insurance Premium Saving', DETAILS.construction.insuranceSaving||0)}
+      <div class="compare-total">Total: ${fmt(TOTALS.construction)}</div>
+      <div class="bar-container">
+        <div class="text-muted" style="font-size:0.65rem;margin-bottom:2px;">Relative to largest sector</div>
+        <div class="bar-track"><div class="bar-fill bar-construction" style="width:${(TOTALS.construction/max*100).toFixed(1)}%"></div></div>
+      </div>
+    </div>
+    <div class="compare-sector-card tourism">
+      <div class="compare-sector-name">&#127958; Tourism</div>
+      ${compareRow('Visitor Disruption Recovery', DETAILS.tourism.disruption_saving||0)}
+      ${compareRow('Cancellation Revenue Recovery', DETAILS.tourism.cancellation_saving||0)}
+      ${compareRow('Visitor Safety Saving', DETAILS.tourism.safety_saving||0)}
+      ${compareRow('Insurance Premium Saving', DETAILS.tourism.insurance_saving||0)}
+      <div class="compare-total">Total: ${fmt(TOTALS.tourism||0)}</div>
+      <div class="bar-container">
+        <div class="text-muted" style="font-size:0.65rem;margin-bottom:2px;">Relative to largest sector</div>
+        <div class="bar-track"><div class="bar-fill bar-tourism" style="width:${((TOTALS.tourism||0)/max*100).toFixed(1)}%"></div></div>
+      </div>
+    </div>
+    <div class="compare-sector-card wrm">
+      <div class="compare-sector-name">&#128167; Water Resources</div>
+      ${compareRow('Hydropower Revenue Uplift', DETAILS.wrm.hydro_saving||0)}
+      ${compareRow('Irrigation Water Saving', DETAILS.wrm.irrig_saving||0)}
+      ${compareRow('Drought Emergency Avoidance', DETAILS.wrm.drought_saving||0)}
+      ${compareRow('Flood Damage Avoidance', DETAILS.wrm.flood_saving||0)}
+      <div class="compare-total">Total: ${fmt(TOTALS.wrm||0)}</div>
+      <div class="bar-container">
+        <div class="text-muted" style="font-size:0.65rem;margin-bottom:2px;">Relative to largest sector</div>
+        <div class="bar-track"><div class="bar-fill bar-wrm" style="width:${((TOTALS.wrm||0)/max*100).toFixed(1)}%"></div></div>
+      </div>
+    </div>
+  `;
+
+  const grandTotal = TOTALS.fisheries + TOTALS.disaster + TOTALS.transport + TOTALS.aqua + TOTALS.health + TOTALS.aviation + TOTALS.energy + TOTALS.banking + TOTALS.construction + (TOTALS.tourism||0) + (TOTALS.wrm||0);
+  const allTotals = {
+    'Fisheries': TOTALS.fisheries, 'Disaster Management': TOTALS.disaster,
+    'Road Transport': TOTALS.transport, 'Farming': TOTALS.aqua,
+    'Human Health': TOTALS.health, 'Aviation': TOTALS.aviation, 'Energy': TOTALS.energy,
+    'Banking': TOTALS.banking, 'Construction': TOTALS.construction, 'Tourism': TOTALS.tourism||0, 'Water Resources': TOTALS.wrm||0
+  };
+  const dominant = Object.keys(allTotals).reduce((a, b) => allTotals[a] >= allTotals[b] ? a : b);
+
+  document.getElementById('compare-insights').innerHTML = `
+    <h3>Total Cross-Sector Value</h3>
+    <p>Based on current inputs, the estimated combined annual value of weather intelligence across all eleven sectors is <strong>${fmt(grandTotal)}</strong>. The <strong>${dominant}</strong> sector shows the largest estimated benefit under current parameter settings.</p>
+    <h3>Key Messages</h3>
+    <p>These figures are illustrative estimates derived from the prescriptive model framework (Rogers 2026; Frei et al. 2014). They demonstrate that weather intelligence delivers measurable, quantifiable value — but should be validated through stakeholder interviews and local data as recommended throughout the paper.</p>
+    <p>The sectors are not independent. Banking connects to every sector in the framework through its lending portfolio — a weather-intelligent bank improves outcomes across all sectors it finances simultaneously. Construction intersects with Road Transport (supply chain haulage), Energy (site power, infrastructure build), and Disaster Management (post-disaster rebuild). Fisheries &amp; Aquaculture overlaps with Disaster Management (marine warnings), Road Transport (fish and seafood haulage), and shares coastal weather dependencies across its two sub-sectors. Farming shares methodology with Road Transport (perishable supply chains). Human Health intersects Disaster Management (extreme events). The full value of NMHS investment is best captured through integrated value chain analysis — not sector-by-sector addition.</p>
+    <h3>Recommendations for Refinement</h3>
+    <p>NMHSs should engage sector stakeholders using a Living Lab approach — conducting structured interviews to establish realistic baselines, reduction rates, and compliance levels for their national context. The Theory of Change framework (Rogers 2026, Figure 7) provides a rigorous structure for measuring impact from inputs through to outcomes.</p>
+  `;
+}
+
+function compareRow(label, value) {
+  return `<div class="compare-row"><span class="clabel">${label}</span><span class="cvalue">${fmt(value || 0)}</span></div>`;
+}
+
+// ================================================================
+// EXPORT
+// ================================================================
+function exportSummary(sector) {
+  calcFisheries(); calcDisaster(); calcTransport(); calcAqua(); calcHealth(); calcAviation(); calcEnergy(); calcBanking(); calcConstruction(); calcTourism(); calcWRM();
+
+  let lines = [];
+  const date = new Date().toLocaleDateString('en-GB', {year:'numeric',month:'long',day:'numeric'});
+  lines.push('WEATHER INTELLIGENCE PRESCRIPTIVE MODEL — VALUE SUMMARY');
+  lines.push('Generated: ' + date);
+  lines.push('Source: Rogers, D. (2026). Maximizing Value Creation. The Business of Weather.');
+  lines.push('');
+
+  if (sector === 'fisheries' || sector === 'all') {
+    lines.push('--- FISHERIES SECTOR ---');
+    lines.push('SAR Cost Avoidance:       ' + fmt(DETAILS.fisheries.sarSaved || 0));
+    lines.push('Vessel Loss Prevention:   ' + fmt(DETAILS.fisheries.vesselLossSaved || 0));
+    lines.push('Fishing Productivity Gain:' + fmt(DETAILS.fisheries.productivityGain || 0));
+    lines.push('Perishable Loss Reduction:' + fmt(DETAILS.fisheries.perishSaved || 0));
+    lines.push('Govt Spending Reduction:  ' + fmt(DETAILS.fisheries.govtSaved || 0));
+    lines.push('TOTAL:                    ' + fmt(TOTALS.fisheries));
+    lines.push('');
+  }
+  if (sector === 'disaster' || sector === 'all') {
+    lines.push('--- DISASTER MANAGEMENT ---');
+    lines.push('Property Damage Avoided:  ' + fmt(DETAILS.disaster.damageSaved || 0));
+    lines.push('Emergency Response Saving:' + fmt(DETAILS.disaster.responseSaved || 0));
+    lines.push('Productivity Prevented:   ' + fmt(DETAILS.disaster.prodSaved || 0));
+    lines.push('TOTAL:                    ' + fmt(TOTALS.disaster));
+    lines.push('');
+  }
+  if (sector === 'transport' || sector === 'all') {
+    lines.push('--- ROAD TRANSPORT ---');
+    lines.push('Freight Delay Savings:    ' + fmt(DETAILS.transport.delaySaved || 0));
+    lines.push('Road Maintenance Savings: ' + fmt(DETAILS.transport.maintSaved || 0));
+    lines.push('Accident Cost Avoidance:  ' + fmt(DETAILS.transport.accSaved || 0));
+    lines.push('Travel Time Value:        ' + fmt(DETAILS.transport.timeSaved || 0));
+    lines.push('TOTAL:                    ' + fmt(TOTALS.transport));
+    lines.push('');
+  }
+  if (sector === 'aqua' || sector === 'all') {
+    lines.push('--- FARMING ---');
+    lines.push('Farming Productivity Gain: ' + fmt(DETAILS.aqua.productivityGain || 0));
+    lines.push('Crop & Aqua Loss Avoidance:' + fmt(DETAILS.aqua.cropSaved || 0));
+    lines.push('Disease Outbreak Savings:  ' + fmt(DETAILS.aqua.diseaseSaved || 0));
+    lines.push('Perishable Loss Reduction: ' + fmt(DETAILS.aqua.perishSaved || 0));
+    lines.push('Extension Service Savings: ' + fmt(DETAILS.aqua.extensionSaved || 0));
+    lines.push('TOTAL:                     ' + fmt(TOTALS.aqua));
+    lines.push('');
+  }
+  if (sector === 'health' || sector === 'all') {
+    lines.push('--- HUMAN HEALTH ---');
+    lines.push('Hospitalisation Avoidance: ' + fmt(DETAILS.health.hospSaved || 0));
+    lines.push('Infectious Disease Savings:' + fmt(DETAILS.health.diseaseSaved || 0));
+    lines.push('Mortality Reduction (VSL): ' + fmt(DETAILS.health.mortalitySaved || 0));
+    lines.push('Workforce Productivity:    ' + fmt(DETAILS.health.workSaved || 0));
+    lines.push('TOTAL:                     ' + fmt(TOTALS.health));
+    lines.push('');
+  }
+  if (sector === 'aviation' || sector === 'all') {
+    lines.push('--- AVIATION ---');
+    lines.push('TAF Fuel Cost Savings:     ' + fmt(DETAILS.aviation.fuelSaved || 0));
+    lines.push('Diversion Cost Avoidance:  ' + fmt(DETAILS.aviation.divSaved || 0));
+    lines.push('Passenger Delay Value:     ' + fmt(DETAILS.aviation.delaySaved || 0));
+    lines.push('De-icing & Ground Savings: ' + fmt(DETAILS.aviation.deiceSaved || 0));
+    lines.push('TOTAL:                     ' + fmt(TOTALS.aviation));
+    lines.push('');
+  }
+  if (sector === 'energy' || sector === 'all') {
+    lines.push('--- ENERGY ---');
+    lines.push('Curtailment Reduction:     ' + fmt(DETAILS.energy.curtailSaved || 0));
+    lines.push('Balancing Cost Savings:    ' + fmt(DETAILS.energy.balSaved || 0));
+    lines.push('Outage Cost Avoidance:     ' + fmt(DETAILS.energy.outageSaved || 0));
+    lines.push('Hydro Optimisation:        ' + fmt(DETAILS.energy.hydroSaved || 0));
+    lines.push('TOTAL:                     ' + fmt(TOTALS.energy));
+    lines.push('');
+  }
+  if (sector === 'banking' || sector === 'all') {
+    lines.push('--- BANKING ---');
+    lines.push('NPL Rate Reduction:        ' + fmt(DETAILS.banking.nplSaving || 0));
+    lines.push('Provisioning Cost Saving:  ' + fmt(DETAILS.banking.provisionSaving || 0));
+    lines.push('Financial Inclusion Revenue:' + fmt(DETAILS.banking.inclusionRevenue || 0));
+    lines.push('Regulatory Compliance Saving:' + fmt(DETAILS.banking.complianceSaving || 0));
+    lines.push('TOTAL:                     ' + fmt(TOTALS.banking));
+    lines.push('');
+  }
+  if (sector === 'construction' || sector === 'all') {
+    lines.push('--- CONSTRUCTION ---');
+    lines.push('Weather Delay Avoidance:   ' + fmt(DETAILS.construction.delaySaving || 0));
+    lines.push('Rework Cost Avoidance:     ' + fmt(DETAILS.construction.reworkSaving || 0));
+    lines.push('Worker Safety Saving:      ' + fmt(DETAILS.construction.safetySaving || 0));
+    lines.push('Insurance Premium Saving:  ' + fmt(DETAILS.construction.insuranceSaving || 0));
+    lines.push('TOTAL:                     ' + fmt(TOTALS.construction));
+    lines.push('');
+  }
+  if (sector === 'tourism' || sector === 'all') {
+    lines.push('--- TOURISM ---');
+    lines.push('Visitor Disruption Recovery:  ' + fmt(DETAILS.tourism.disruption_saving || 0));
+    lines.push('Cancellation Revenue Recovery:' + fmt(DETAILS.tourism.cancellation_saving || 0));
+    lines.push('Visitor Safety Saving:        ' + fmt(DETAILS.tourism.safety_saving || 0));
+    lines.push('Insurance Premium Saving:     ' + fmt(DETAILS.tourism.insurance_saving || 0));
+    lines.push('TOTAL:                        ' + fmt(TOTALS.tourism));
+    lines.push('');
+  }
+  if (sector === 'wrm' || sector === 'all') {
+    lines.push('--- WATER RESOURCE MANAGEMENT ---');
+    lines.push('Hydropower Revenue Uplift:    ' + fmt(DETAILS.wrm.hydro_saving || 0));
+    lines.push('Irrigation Water Saving:      ' + fmt(DETAILS.wrm.irrig_saving || 0));
+    lines.push('Drought Emergency Avoidance:  ' + fmt(DETAILS.wrm.drought_saving || 0));
+    lines.push('Flood Damage Avoidance:       ' + fmt(DETAILS.wrm.flood_saving || 0));
+    lines.push('TOTAL:                        ' + fmt(TOTALS.wrm));
+    lines.push('');
+  }
+  if (sector === 'all') {
+    lines.push('--- COMBINED TOTAL ---');
+    lines.push('ALL SECTORS:              ' + fmt(TOTALS.fisheries + TOTALS.disaster + TOTALS.transport + TOTALS.aqua + TOTALS.health + TOTALS.aviation + TOTALS.energy + TOTALS.banking + TOTALS.construction + (TOTALS.tourism||0) + (TOTALS.wrm||0)));
+    lines.push('');
+    lines.push('NOTE: Sectors share overlapping value chains. Do not simply sum without');
+    lines.push('      accounting for double-counting across all sectors.');
+  }
+  lines.push('Model framework: Frei et al. (2014); Wissuchek & Zschech (2025); Rogers (2026)');
+  lines.push('These are illustrative estimates. Validate with local stakeholder data.');
+
+  const blob = new Blob([lines.join('\n')], {type: 'text/plain'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `weather_intelligence_value_${sector}_${new Date().toISOString().split('T')[0]}.txt`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function exportAllSectors() {
+  exportSummary('all');
+}
+
+// ================================================================
+// TOOLTIP ENGINE
+// Appended to <body> — escapes all overflow clipping.
+// Fixed positioning + viewport clamping fixes left-column cutoff.
+// ================================================================
+(function() {
+  const PAD = 10;
+  const tip = document.createElement('div');
+  tip.className = 'js-tooltip';
+  document.body.appendChild(tip);
+
+  function show(el) {
+    tip.textContent = el.dataset.tip;
+    // Make visible but off-screen to measure real dimensions
+    tip.style.left = '-9999px';
+    tip.style.top  = '-9999px';
+    tip.classList.add('visible');
+
+    const tw = tip.offsetWidth;
+    const th = tip.offsetHeight;
+    const r  = el.getBoundingClientRect();
+
+    // Prefer above; flip below if not enough room
+    let top  = r.top - th - 8;
+    if (top < PAD) top = r.bottom + 8;
+
+    // Centre horizontally, clamped to viewport
+    let left = r.left + r.width / 2 - tw / 2;
+    left = Math.max(PAD, Math.min(left, window.innerWidth - tw - PAD));
+
+    tip.style.left = left + 'px';
+    tip.style.top  = top  + 'px';
+  }
+
+  function hide() {
+    tip.classList.remove('visible');
+  }
+
+  document.addEventListener('mouseover', function(e) {
+    const el = e.target.closest('[data-tip]');
+    if (el) show(el);
+  });
+
+  document.addEventListener('mouseout', function(e) {
+    const el = e.target.closest('[data-tip]');
+    // Only hide when truly leaving the element (not moving to a child)
+    if (el && !el.contains(e.relatedTarget)) hide();
+  });
+
+  document.addEventListener('scroll', hide, true);
+})();
+
+// ================================================================
+// INIT
+// ================================================================
+window.onload = function() {
+  calcFisheries();
+  calcDisaster();
+  calcTransport();
+  calcAqua();
+  calcHealth();
+  calcAviation();
+  calcEnergy();
+  calcBanking();
+  calcConstruction();
+  calcTourism();
+  calcWRM();
+};
+</script>
+</body>
+</html>
